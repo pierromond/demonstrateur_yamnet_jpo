@@ -43,10 +43,10 @@ import threading
 import time
 import types
 from datetime import timezone
+
 from importlib_resources import files
 from typing import List
 import base64
-
 import numpy as np
 import resampy
 import tflite_runtime.interpreter as tflite
@@ -169,7 +169,7 @@ class TriggerProcessor:
 
     def butter_highpass_filter(self, waveform):
         from scipy import signal
-        return signal.sosfilt(self.sos, waveform)
+        return np.array(signal.sosfilt(self.sos, waveform), dtype=np.float32)
 
     def init_socket(self):
         context = zmq.Context()
@@ -225,22 +225,19 @@ class TriggerProcessor:
         if len(tags_indexes) == 0:
             print("No tags to process or tags not found in the yamnet list")
             return {}
-        document, document_scores, document_orders = ({}, {}, {})
+
         start = time.time()
         scores, embeddings, spectrogram = self.process_tags(samples)
         self.processing_time += time.time() - start
 
         # Take maximum found prediction (was avg in the ref)
         prediction = np.max(scores, axis=0)
-        ordered_scores = np.argsort(prediction)
-
         tags_over_threshold = tags_indexes[np.nonzero(self.yamnet_classes[1][tags_indexes] <= prediction[tags_indexes])]
 
-        self.processing_time = 0
         document = {
-            "scores": dict(zip(self.yamnet_classes[0][tags_over_threshold], [float(v) for v in prediction[tags_over_threshold]])),
-            "orders": dict(zip(self.yamnet_classes[0][tags_over_threshold], [float(v) for v in len(self.yamnet_classes[0]) - ordered_scores[tags_over_threshold]])),
+            "scores": dict(zip(self.yamnet_classes[0][tags_over_threshold], [float(v) for v in prediction[tags_over_threshold] - self.yamnet_classes[1][tags_over_threshold]]))
         }
+
         if self.config.verbose:
             print(document)
             print("%s processed in %.3f seconds for "
@@ -248,6 +245,7 @@ class TriggerProcessor:
                   (time.strftime("%Y-%m-%d %H:%M:%S"), self.processing_time,
                    len(samples) /
                    self.yamnet_config.sample_rate))
+        self.processing_time = 0
         if add_spectrogram:
             document["spectrogram"] = base64.b64encode(
                 spectrogram.astype(np.float16).
