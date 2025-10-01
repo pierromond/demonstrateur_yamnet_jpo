@@ -212,6 +212,7 @@ def publish_samples(args):
 
 
 def reset_usb():
+    print("Zero bytes rate detected, trying to reset USB Audio")
     found_usb_audio = False
     from usb.core import find as finddev
     for device in finddev(find_all=True):
