@@ -98,7 +98,7 @@ def read_yamnet_class_and_threshold(class_map_csv):
         next(reader)  # Skip header
         names, threshold = zip(
             *[[display_name.strip(), float(threshold)] for _, _, display_name, threshold in reader])
-        return names, np.array(threshold, dtype=float)
+        return np.array(names), np.array(threshold, dtype=float)
 
 
 def compute_butter_highpass_coefficients(cutoff, fs, order=4):
@@ -121,7 +121,6 @@ class TriggerProcessor:
     """
     Service listening to zero_record and trigger sound recording according to pre-defined noise events
     """
-    socket_out_recording = None
     socket_out_recognition = None
 
     def __init__(self, config):
@@ -137,7 +136,6 @@ class TriggerProcessor:
         self.last_fetch_trigger_info = 0
         self.epoch = datetime.datetime.fromtimestamp(0, tz=datetime.timezone.utc)
         self.socket = None
-        self.socket_out_recording = None
         self.yamnet_config = Params()
         tflite_path = self.config.yamnet_weights
         if self.config.verbose:
@@ -178,8 +176,6 @@ class TriggerProcessor:
         self.socket = context.socket(zmq.SUB)
         self.socket.connect(self.config.input_address)
         self.socket.subscribe("")
-        self.socket_out_recording = context.socket(zmq.PUB)
-        self.socket_out_recording.bind(self.config.output_address_recording)
         self.socket_out_recognition = context.socket(zmq.PUB)
         self.socket_out_recognition.bind(self.config.output_address_recognition)
 
@@ -222,7 +218,10 @@ class TriggerProcessor:
         @param add_spectrogram: add spectrogram in dictionary
         @return: dict
         """
-        tags_indexes = [self.yamnet_classes[0].index(tag) for tag in tags if tag in self.yamnet_classes[0]]
+        if len(tags) == len(self.yamnet_classes[0]):
+            tags_indexes = np.arange(len(tags))
+        else:
+            tags_indexes = np.where(np.isin(self.yamnet_classes[0], tags))[0]
         if len(tags_indexes) == 0:
             print("No tags to process or tags not found in the yamnet list")
             return {}
@@ -230,30 +229,25 @@ class TriggerProcessor:
         start = time.time()
         scores, embeddings, spectrogram = self.process_tags(samples)
         self.processing_time += time.time() - start
-        ordered_scores = np.argsort(scores)
 
         # Take maximum found prediction (was avg in the ref)
         prediction = np.max(scores, axis=0)
+        ordered_scores = np.argsort(prediction)
 
-        for tag_i in tags_indexes:
-            tag_name = self.yamnet_classes[0][tag_i]
-            tag_score = float(prediction[tag_i])
-            tag_order = int(521 - np.max(np.where(ordered_scores==tag_i)[1]))
-            document_scores.update({tag_name: tag_score})
-            document_orders.update({tag_name: tag_order})
+        tags_over_threshold = tags_indexes[np.nonzero(self.yamnet_classes[1][tags_indexes] <= prediction[tags_indexes])]
 
-        if self.config.verbose:
-            print("%s tags:%s \n processed in %.3f seconds for "
-                  "%.1f seconds of audio." %
-                  (time.strftime("%Y-%m-%d %H:%M:%S"),
-                   ",".join(tags), self.processing_time,
-                   len(samples) /
-                   self.yamnet_config.sample_rate))
         self.processing_time = 0
         document = {
-            "scores": document_scores,
-            "orders": document_orders,
+            "scores": dict(zip(self.yamnet_classes[0][tags_over_threshold], [float(v) for v in prediction[tags_over_threshold]])),
+            "orders": dict(zip(self.yamnet_classes[0][tags_over_threshold], [float(v) for v in len(self.yamnet_classes[0]) - ordered_scores[tags_over_threshold]])),
         }
+        if self.config.verbose:
+            print(document)
+            print("%s processed in %.3f seconds for "
+                  "%.1f seconds of audio." %
+                  (time.strftime("%Y-%m-%d %H:%M:%S"), self.processing_time,
+                   len(samples) /
+                   self.yamnet_config.sample_rate))
         if add_spectrogram:
             document["spectrogram"] = base64.b64encode(
                 spectrogram.astype(np.float16).
@@ -289,7 +283,7 @@ class TriggerProcessor:
                     continue
                 self.yamnet_samples_index = 0  # reset index
                 document = self.generate_yamnet_document_tags(
-                    self.yamnet_samples, self.config.trigger_tags, self.config.add_spectrogram)
+                    self.yamnet_samples, self.yamnet_classes[0], self.config.add_spectrogram)
                 document["date"] = epoch_to_elasticsearch_date(self.frame_time)
                 self.socket_out_recognition.send_json(document)
             time.sleep(0.05)
