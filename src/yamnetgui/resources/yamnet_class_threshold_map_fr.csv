@@ -322,7 +322,7 @@ index,mid,display_name,threshold
 320,/m/04_sv,Moto,0.20692268
 321,/m/0btp2,"Bruit de la circulation,bruit de la route",0.102626778
 322,/m/06d_3,Transport ferroviaire,0.487690419
-323,/m/07jdr,Former,0.05
+323,/m/07jdr,Train,0.10
 324,/m/04zmvq,Sifflet de train,0.324747264
 325,/m/0284vy3,Klaxon de train,0.422004044
 326,/m/01g50p,"Wagon de chemin de fer,wagon de train",0.467045546
