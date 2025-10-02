@@ -7,42 +7,30 @@
 
 from __future__ import annotations
 import sys
-import time
 
 import numpy as np
-from matplotlib.backends.backend_qtagg import FigureCanvas
-from matplotlib.backends.backend_qtagg import \
-    NavigationToolbar2QT as NavigationToolbar
-from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
 import zmq
-import json
 
 
-class ApplicationWindow(QtWidgets.QMainWindow):
+class ApplicationWindow:
     def __init__(self):
         super().__init__()
         self.socket = None
         self.init_socket()
-        self._main = QtWidgets.QWidget()
-        self.setCentralWidget(self._main)
-        layout = QtWidgets.QVBoxLayout(self._main)
 
-        dynamic_canvas = FigureCanvas(Figure(figsize=(5, 3)))
-        layout.addWidget(dynamic_canvas)
-        layout.addWidget(NavigationToolbar(dynamic_canvas, self))
         self.rng = np.random.default_rng(19680801)
-        self._dynamic_ax = dynamic_canvas.figure.subplots()
-        self._dynamic_ax.set_title(f'Reconnaissance de sources audio')
+        fig, self._dynamic_ax = plt.subplots(num="Reconnaissance de sources audio")
         # Set up a Line2D.
         self.tags = np.array([])
         self.scores = np.array([])
         self._update_data()
         self.container = self._dynamic_ax.barh(self.tags, self.scores)
-
-        self.ani = animation.FuncAnimation(fig=dynamic_canvas.figure, func=self._update_data, frames=40 ,interval=125)
+        self.ani = animation.FuncAnimation(fig=fig, func=self._update_data, frames=40 ,interval=125)
+        plt.show()
 
     def init_socket(self):
         context = zmq.Context()
@@ -75,12 +63,4 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     # Check whether there is already a running QApplication (e.g., if running
     # from an IDE).
-    qapp = QtWidgets.QApplication.instance()
-    if not qapp:
-        qapp = QtWidgets.QApplication(sys.argv)
-
     app = ApplicationWindow()
-    app.show()
-    app.activateWindow()
-    app.raise_()
-    qapp.exec()
