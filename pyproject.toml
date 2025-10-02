@@ -22,7 +22,7 @@ classifiers = [
 requires-python = ">=3.8.1,<3.11"
 dynamic = ["version"]
 dependencies = [
-    "numpy",
+    "numpy<2", # tensorflow use numpy 1.x on raspberry pi
     "scipy",
     "matplotlib",
     "pyzmq>=25.1.2",
