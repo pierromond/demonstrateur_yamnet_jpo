@@ -44,7 +44,12 @@ import time
 import types
 from datetime import timezone
 
-from importlib_resources import files
+try:
+    from importlib.resources import files
+except ImportError:
+    # Old python fallback
+    from importlib_resources import files
+
 from typing import List
 import base64
 import numpy as np

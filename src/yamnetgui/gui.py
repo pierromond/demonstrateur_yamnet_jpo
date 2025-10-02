@@ -46,6 +46,8 @@ class ApplicationWindow:
             data = json_data["scores"]
             # Sort tags by score (descending)
             tags = sorted(data, key=data.get)[:6]
+            if len(tags) == 0:
+                return
             scores = [data[tag] for tag in tags]
             self.tags = tags
             self.scores = np.array(scores) * 100
