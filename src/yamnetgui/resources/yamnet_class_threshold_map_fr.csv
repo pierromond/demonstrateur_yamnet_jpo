@@ -1,0 +1,522 @@
+index,mid,display_name,threshold
+0,/m/09x0r,Discussion,0.663131595
+1,/m/0ytgt,"Parole d'enfant,enfant qui parle",0.233555675
+2,/m/01h8n0,Conversation,0.079049014
+3,/m/02qldy,"Narration,monologue",0.148160264
+4,/m/0261r1,Babillage,0.29551515
+5,/m/0brhx,Synthétiseur vocal,0.114881948
+6,/m/07p6fty,Crier,0.123608574
+7,/m/07q4ntr,Soufflet,0.115662575
+8,/m/07rwj3x,Cri,0.185566455
+9,/m/07sr1lc,Crier,0.203322187
+10,/t/dd00135,Enfants qui crient,0.14569521
+11,/m/03qc9zr,Hurlement,0.218166262
+12,/m/02rtxlg,Chuchotement,0.439987093
+13,/m/01j3sz,Rire,0.373072088
+14,/t/dd00001,Rires de bébé,0.498326451
+15,/m/07r660_,Pouffer de rire,0.231795475
+16,/m/07s04w4,Ricanement,0.203020319
+17,/m/07sq110,Rire du ventre,0.263697952
+18,/m/07rgt08,"Rire,rire",0.212297976
+19,/m/0463cq4,"Pleurer,sangloter",0.250249505
+20,/t/dd00002,"Les pleurs du bébé,les pleurs du nourrisson",0.366189182
+21,/m/07qz6j3,Gémissement,0.165533066
+22,/m/07qw_06,"Gémir,gémir",0.117786862
+23,/m/07plz5l,Soupir,0.121035784
+24,/m/015lz1,Chant,0.334172606
+25,/m/0l14jd,Chœur,0.310240626
+26,/m/01swy6,Yodel,0.104060158
+27,/m/02bk07,Chant,0.23072274
+28,/m/01c194,Mantra,0.296109617
+29,/t/dd00005,Enfant chantant,0.292762011
+30,/t/dd00006,Chant synthétique,0.189190939
+31,/m/06bxc,Rap,0.213257313
+32,/m/02fxyj,Bourdonnement,0.147413835
+33,/m/07s2xch,Gémissement,0.267993331
+34,/m/07r4k75,Grognement,0.183808699
+35,/m/01w250,Sifflement,0.331246257
+36,/m/0lyf6,Respiration,0.078809544
+37,/m/07mzm6,Respiration sifflante,0.068359815
+38,/m/01d3sd,Ronflement,0.115220405
+39,/m/07s0dtb,Haleter,0.144594833
+40,/m/07pyy8b,Haleter,0.068428777
+41,/m/07q0yl5,Renifler,0.077853985
+42,/m/01b_21,Toux,0.324417293
+43,/m/0dl9sf8,Éclaircissement de la gorge,0.255496502
+44,/m/01hsr_,Éternuer,0.230125844
+45,/m/07ppn3j,Renifler,0.079365209
+46,/m/06h7j,Courir,0.078879051
+47,/m/07qv_x_,Mélanger,0.035825808
+48,/m/07pbtc8,"Marche,pas",0.097542576
+49,/m/03cczk,"Mâcher,mastiquer",0.24013032
+50,/m/07pdhp0,Mordant,0.164163366
+51,/m/0939n_,Gargarisme,0.043829158
+52,/m/01g90h,Gargouillements d'estomac,0.029107671
+53,/m/03q5_w,"Rots,éructations",0.266600043
+54,/m/02p3nc,Hoquet,0.144014791
+55,/m/02_nn,Péter,0.123087049
+56,/m/0k65p,Mains,0.138297305
+57,/m/025_jnm,Claquer des doigts,0.070497356
+58,/m/0l15bq,Applaudissements,0.128759995
+59,/m/01jg02,"Bruits du cœur,battements du cœur",0.586156607
+60,/m/01jg1z,Souffle au cœur,0.377441734
+61,/m/053hz1,Applaudissement,0.211448893
+62,/m/028ght,Applaudissements,0.139219627
+63,/m/07rkbfh,Bavarder,0.247834355
+64,/m/03qtwd,Foule,0.304168642
+65,/m/07qfr4h,"Brouhaha,bruit de parole,babillage",0.116272435
+66,/t/dd00013,Enfants jouant,0.214131489
+67,/m/0jbk,Animal,0.44654569
+68,/m/068hy,"Animaux domestiques,animaux de compagnie",0.502729535
+69,/m/0bt9lr,Chien,0.502826989
+70,/m/05tny_,Aboyer,0.29924795
+71,/m/07r_k2n,Ouais,0.248220921
+72,/m/07qf0zm,Hurler,0.31447342
+73,/m/07rc7d9,Toutou,0.371089131
+74,/m/0ghcn6,Grondement,0.198315382
+75,/t/dd00136,Gémissement (chien),0.269767046
+76,/m/01yrx,Chat,0.661231399
+77,/m/02yds9,Ronronner,0.172264501
+78,/m/07qrkrw,Miaou,0.447990417
+79,/m/07rjwbb,Sifflement,0.254105061
+80,/m/07r81j2,Miaulement,0.211083338
+81,/m/0ch8v,"Bétail,animaux de ferme,animaux de travail",0.25670734
+82,/m/03k3r,Cheval,0.277501345
+83,/m/07rv9rh,Clip-clop,0.23132506
+84,/m/07q5rw0,"Hennissement,hennissement",0.327387959
+85,/m/01xq0k1,"Bovins,bovinae",0.143070012
+86,/m/07rpkh9,Meuglement,0.123658635
+87,/m/0239kh,Sonnaille,0.067611158
+88,/m/068zj,Cochon,0.152138457
+89,/t/dd00018,Groin,0.110466607
+90,/m/03fwl,Chèvre,0.425498694
+91,/m/07q0h5t,Bêler,0.38615489
+92,/m/07bgp,Mouton,0.499358416
+93,/m/025rv6n,Volaille,0.287642866
+94,/m/09b5t,"Poulet,coq",0.57516247
+95,/m/07st89h,Glousser,0.37550348
+96,/m/07qn5dc,"Cocorico,chant",0.536303699
+97,/m/01rd7k,Turquie,0.170065507
+98,/m/07svc2k,Glouglou,0.143449247
+99,/m/09ddx,Canard,0.250974685
+100,/m/07qdb04,Charlatan,0.175435185
+101,/m/0dbvp,Oie,0.283875763
+102,/m/07qwf61,Klaxonner,0.276641488
+103,/m/01280g,Animaux sauvages,0.316515833
+104,/m/0cdnk,"Chats rugissants (lions,tigres)",0.312159359
+105,/m/04cvmfc,Rugir,0.382700235
+106,/m/015p6,Oiseau,0.249224812
+107,/m/020bb7,"Vocalisation des oiseaux,cri d'oiseau,chant d'oiseau",0.11407949
+108,/m/07pggtn,"Gazouillement,tweet",0.171352997
+109,/m/07sx8x_,Cri,0.022521921
+110,/m/0h0rv,"Pigeon,colombe",0.525361836
+111,/m/07r_25d,Roucouler,0.258235306
+112,/m/04s8yn,Corbeau,0.172924042
+113,/m/07r5c2p,Croasser,0.154051647
+114,/m/09d5_,Hibou,0.277525753
+115,/m/07r_80w,Huée,0.057413232
+116,/m/05_wcq,"Vol d'oiseau,battements d'ailes",0.151714608
+117,/m/01z5f,"Canidés,chiens,loups",0.220703542
+118,/m/06hps,"Rongeurs,rats,souris",0.114968784
+119,/m/04rmv,Souris,0.084620617
+120,/m/07r4gkf,Crépiter,0.133851618
+121,/m/03vt0,Insecte,0.155930132
+122,/m/09xqv,Cricket,0.129208148
+123,/m/09f96,Moustique,0.165145859
+124,/m/0h2mp,"Mouche,mouche domestique",0.081412442
+125,/m/07pjwq1,Bourdonner,0.052863088
+126,/m/01h3n,"Abeille,guêpe,etc.",0.306852907
+127,/m/09ld4,Grenouille,0.485871822
+128,/m/07st88b,Crever,0.215655431
+129,/m/078jl,Serpent,0.111441046
+130,/m/07qn4z3,Hochet,0.081631362
+131,/m/032n05,Vocalisation des baleines,0.216013104
+132,/m/04rlf,Musique,0.695782125
+133,/m/04szw,Instrument de musique,0.664697647
+134,/m/0fx80y,Instrument à cordes pincées,0.644903183
+135,/m/0342h,Guitare,0.677955449
+136,/m/02sgy,Guitare électrique,0.265161753
+137,/m/018vs,Guitare basse,0.214493647
+138,/m/042v_gx,Guitare acoustique,0.332311481
+139,/m/06w87,"Guitare en acier,guitare slide",0.095357895
+140,/m/01glhc,Tapping (technique de guitare),0.112518124
+141,/m/07s0s5r,Gratter,0.30383411
+142,/m/018j2,Banjo,0.361035645
+143,/m/0jtg0,Sitar,0.366262436
+144,/m/04rzd,Mandoline,0.190164849
+145,/m/01bns_,Cithare,0.219142079
+146,/m/07xzm,Ukulélé,0.181958601
+147,/m/05148p4,Clavier (musical),0.321676046
+148,/m/05r5c,Piano,0.385540247
+149,/m/01s0ps,Piano électrique,0.325575382
+150,/m/013y1f,Organe,0.194115222
+151,/m/03xq_f,Orgue électronique,0.28050372
+152,/m/03gvt,Orgue Hammond,0.356615514
+153,/m/0l14qv,Synthétiseur,0.275485277
+154,/m/01v1d8,Échantillonneur,0.069920674
+155,/m/03q5t,Clavecin,0.072910741
+156,/m/0l14md,Percussion,0.230211183
+157,/m/02hnl,Batterie,0.554444551
+158,/m/0cfdd,Boîte à rythmes,0.107196212
+159,/m/026t6,Tambour,0.325900227
+160,/m/06rvn,Caisse claire,0.455587745
+161,/m/03t3fj,Rimshot,0.316852182
+162,/m/02k_mr,Roulement de tambour,0.297954619
+163,/m/0bm02,Grosse caisse,0.36236921
+164,/m/011k_j,Timbales,0.303963929
+165,/m/01p970,Table,0.295500129
+166,/m/01qbl,Cymbale,0.285343617
+167,/m/03qtq,Charleston,0.32222259
+168,/m/01sm1g,Bloc de bois,0.183640361
+169,/m/07brj,Tambourin,0.151852444
+170,/m/05r5wn,Hochet (instrument),0.177172914
+171,/m/0xzly,Maraca,0.161213964
+172,/m/0mbct,Gong,0.17275995
+173,/m/016622,Cloches tubulaires,0.121038929
+174,/m/0j45pbj,percussion à maillet,0.296782434
+175,/m/0dwsp,"Marimba,xylophone",0.357874542
+176,/m/0dwtp,Glockenspiel,0.317277491
+177,/m/0dwt5,Vibraphone,0.085060105
+178,/m/0l156b,Casserole en acier,0.091474771
+179,/m/05pd6,Orchestre,0.274709433
+180,/m/01kcd,Instrument de cuivre,0.333184689
+181,/m/0319l,cor français,0.428960562
+182,/m/07gql,Trompette,0.424405456
+183,/m/07c6l,Trombone,0.472386688
+184,/m/0l14_3,Instrument à cordes frottées,0.274520278
+185,/m/02qmj0d,Section de cordes,0.152847514
+186,/m/07y_7,"Violon,violon",0.59591496
+187,/m/0d8_n,Pizzicato,0.114062063
+188,/m/01xqw,Violoncelle,0.304534048
+189,/m/02fsn,Contrebasse,0.173844486
+190,/m/085jw,"Instrument à vent,instrument à vent en bois",0.183094144
+191,/m/0l14j_,Flûte,0.437521011
+192,/m/06ncr,Saxophone,0.348937362
+193,/m/01wy6,Clarinette,0.114024296
+194,/m/03m5k,Harpe,0.287115008
+195,/m/0395lw,Cloche,0.447264761
+196,/m/03w41f,Cloche d'église,0.498801082
+197,/m/027m70_,Clochette,0.481084675
+198,/m/0gy1t2s,Sonnette de vélo,0.237709165
+199,/m/07n_g,Diapason,0.152658209
+200,/m/0f8s22,Carillon,0.203257158
+201,/m/026fgl,Carillon éolien,0.142850056
+202,/m/0150b9,Changer la sonnerie (campanologie),0.283088088
+203,/m/03qjg,Harmonica,0.203034624
+204,/m/0mkg,Accordéon,0.338806301
+205,/m/0192l,Cornemuse,0.342162341
+206,/m/02bxd,Didgeridoo,0.082724355
+207,/m/0l14l2,Shofar,0.181253314
+208,/m/07kc_,Thérémine,0.142299175
+209,/m/0l14t7,Bol chantant,0.407767326
+210,/m/01hgjl,Scratching (technique de performance),0.2001753
+211,/m/064t9,Musique pop,0.175155237
+212,/m/0glt670,Musique hip-hop,0.226504967
+213,/m/02cz_7,Beatboxing,0.135438621
+214,/m/06by7,Musique rock,0.20140484
+215,/m/03lty,Métal lourd,0.207650691
+216,/m/05r6t,Punk rock,0.184391364
+217,/m/0dls3,Grunge,0.14775604
+218,/m/0dl5d,Rock progressif,0.124065042
+219,/m/07sbbz2,Rock and roll,0.162180975
+220,/m/05w3f,Rock psychédélique,0.18374382
+221,/m/06j6l,Rythme et blues,0.114576831
+222,/m/0gywn,Musique soul,0.111013003
+223,/m/06cqb,Reggae,0.130258381
+224,/m/01lyv,Pays,0.279570192
+225,/m/015y_n,Musique swing,0.195873886
+226,/m/0gg8l,Bluegrass,0.197946325
+227,/m/02x8m,Trouille,0.096758164
+228,/m/02w4v,Musique folklorique,0.183918893
+229,/m/06j64v,musique du Moyen-Orient,0.185409769
+230,/m/03_d0,Jazz,0.210506797
+231,/m/026z9,Disco,0.115051344
+232,/m/0ggq0m,Musique classique,0.255958617
+233,/m/05lls,Opéra,0.23816818
+234,/m/02lkt,Musique électronique,0.412831038
+235,/m/03mb9,Musique house,0.111430436
+236,/m/07gxw,Techno,0.129632458
+237,/m/07s72n,Dubstep,0.134312242
+238,/m/0283d,Drum and bass,0.088922143
+239,/m/0m0jc,Électronique,0.078854039
+240,/m/08cyft,Musique de danse électronique,0.093672603
+241,/m/0fd3y,Musique d'ambiance,0.183921918
+242,/m/07lnk,Musique trance,0.152654558
+243,/m/0g293,Musique d'Amérique latine,0.358672321
+244,/m/0ln16,Musique salsa,0.522390962
+245,/m/0326g,Flamenco,0.122381479
+246,/m/0155w,Blues,0.141842276
+247,/m/05fw6t,Musique pour enfants,0.312739849
+248,/m/02v2lh,Musique new age,0.192540139
+249,/m/0y4f8,Musique vocale,0.168585971
+250,/m/0z9c,A capella,0.164358288
+251,/m/0164x2,Musique d'Afrique,0.102144323
+252,/m/0145m,Afrobeat,0.086320125
+253,/m/02mscn,musique chrétienne,0.227192894
+254,/m/016cjb,Gospel,0.184776977
+255,/m/028sqc,Musique d'Asie,0.14503032
+256,/m/015vgc,Musique carnatique,0.315148413
+257,/m/0dq0md,Musique de Bollywood,0.369802952
+258,/m/06rqw,Ska,0.175568014
+259,/m/02p0sh1,Musique traditionnelle,0.224747136
+260,/m/05rwpb,Musique indépendante,0.077284612
+261,/m/074ft,Chanson,0.052710533
+262,/m/025td0t,Musique de fond,0.110848658
+263,/m/02cjck,Musique du thème,0.131275043
+264,/m/03r5q_,Jingle (musique),0.098749198
+265,/m/0l14gg,Musique de la bande originale,0.108967468
+266,/m/07pkxdp,Berceuse,0.168360233
+267,/m/01z7dr,Musique de jeux vidéo,0.140018523
+268,/m/0140xf,musique de Noël,0.131075948
+269,/m/0ggx5q,Musique de danse,0.069544785
+270,/m/04wptg,Musique de mariage,0.064275727
+271,/t/dd00031,Musique joyeuse,0.05340232
+272,/t/dd00033,Musique triste,0.141525686
+273,/t/dd00034,Musique tendre,0.091772437
+274,/t/dd00035,Musique excitante,0.060108818
+275,/t/dd00036,Musique en colère,0.289104104
+276,/t/dd00037,Musique effrayante,0.172716737
+277,/m/03m9d0z,Vent,0.138315216
+278,/m/09t49,Bruissement des feuilles,0.055980973
+279,/t/dd00092,Bruit du vent (microphone),0.161091596
+280,/m/0jb2l,Orage,0.457061023
+281,/m/0ngt1,Tonnerre,0.563930094
+282,/m/0838f,Eau,0.257889897
+283,/m/06mb1,Pluie,0.320453703
+284,/m/07r10fb,Goutte de pluie,0.208118558
+285,/t/dd00038,Pluie à la surface,0.356790185
+286,/m/0j6m2,Flux,0.244035527
+287,/m/0j2kx,Cascade,0.246880203
+288,/m/05kq4,Océan,0.323650539
+289,/m/034srq,"Vagues,surf",0.338499546
+290,/m/06wzb,Vapeur,0.369944096
+291,/m/07swgks,Gargouillis,0.096132152
+292,/m/02_41,Feu,0.063047104
+293,/m/07pzfmf,Crépiter,0.074694604
+294,/m/07yv9,Véhicule,0.61871177
+295,/m/019jd,"Bateau,véhicule nautique",0.179446802
+296,/m/0hsrw,"Voilier,voilier",0.187928498
+297,/m/056ks2,"Chaloupe,canoë,kayak",0.179120854
+298,/m/02rlv9,"Bateau à moteur,hors-bord",0.128375039
+299,/m/06q74,Bateau,0.112537846
+300,/m/012f08,Véhicule à moteur (route),0.162375972
+301,/m/0k4j,Voiture,0.48143366
+302,/m/0912c9,"Klaxon de véhicule,klaxon de voiture,klaxon",0.384600937
+303,/m/07qv_d5,Siffler,0.386194468
+304,/m/02mfyn,Alarme de voiture,0.097251847
+305,/m/04gxbd,"Vitres électriques,vitres électriques",0.176437467
+306,/m/07rknqz,Dérapage,0.275554746
+307,/m/0h9mv,crissement de pneu,0.219990492
+308,/t/dd00134,Une voiture passe,0.115634248
+309,/m/0ltv,"Voiture de course,course automobile",0.382500648
+310,/m/07r04,Camion,0.273021817
+311,/m/0gvgw0,Frein à air,0.138077229
+312,/m/05x_td,"Klaxon à air comprimé,klaxon de camion",0.218268767
+313,/m/02rhddq,Bips de marche arrière,0.093336672
+314,/m/03cl9h,"Camion de glaces,camionnette de glaces",0.078854173
+315,/m/01bjv,Bus,0.12708573
+316,/m/03j1ly,Véhicule d'urgence,0.351332217
+317,/m/04qvtq,Voiture de police (sirène),0.432965875
+318,/m/012n7d,Ambulance (sirène),0.282593876
+319,/m/012ndj,"Camion de pompiers,camion de pompiers (sirène)",0.278387576
+320,/m/04_sv,Moto,0.20692268
+321,/m/0btp2,"Bruit de la circulation,bruit de la route",0.102626778
+322,/m/06d_3,Transport ferroviaire,0.487690419
+323,/m/07jdr,Former,0.05
+324,/m/04zmvq,Sifflet de train,0.324747264
+325,/m/0284vy3,Klaxon de train,0.422004044
+326,/m/01g50p,"Wagon de chemin de fer,wagon de train",0.467045546
+327,/t/dd00048,Les roues du train crissent,0.221710682
+328,/m/0195fx,"Métro,métro souterrain",0.190360218
+329,/m/0k5j,Aéronef,0.299334228
+330,/m/014yck,Moteur d'avion,0.252298236
+331,/m/04229,Moteur à réaction,0.296206057
+332,/m/02l6bg,"Hélice,hélice",0.16553238
+333,/m/09ct_,Hélicoptère,0.156141818
+334,/m/0cmf2,"Avion à voilure fixe,avion",0.298614621
+335,/m/0199g,Vélo,0.074093737
+336,/m/06_fw,Skateboard,0.17546545
+337,/m/02mk9,Moteur,0.387351185
+338,/t/dd00065,Moteur léger (haute fréquence),0.096594892
+339,/m/08j51y,"Fraise dentaire,fraise de dentiste",0.056031898
+340,/m/01yg9g,tondeuse à gazon,0.136818618
+341,/m/01j4z9,Tronçonneuse,0.225480139
+342,/t/dd00066,Moteur moyen (fréquence moyenne),0.232694268
+343,/t/dd00067,Moteur lourd (basse fréquence),0.123488508
+344,/m/01h82_,Cognement du moteur,0.144582197
+345,/t/dd00130,Démarrage du moteur,0.354518861
+346,/m/07pb8fc,Marche au ralenti,0.290382713
+347,/m/07q2z82,"Accélération,accélération,vroom",0.203454256
+348,/m/02dgv,Porte,0.315597534
+349,/m/03wwcy,Sonnette,0.3486166
+350,/m/07r67yg,Ding-dong,0.21867843
+351,/m/02y_763,Porte coulissante,0.17909281
+352,/m/07rjzl8,Claquer,0.189475045
+353,/m/07r4wb8,Frappe,0.085836619
+354,/m/07qcpgn,Robinet,0.147365272
+355,/m/07q6cd_,Grincer,0.063325681
+356,/m/0642b4,Placard ouvert ou fermé,0.084238157
+357,/m/0fqfqc,Tiroir ouvert ou fermé,0.169087112
+358,/m/04brg2,"Plats,casseroles et poêles",0.447392136
+359,/m/023pjk,"Couverts,argenterie",0.400630862
+360,/m/07pn_8q,Hacher (nourriture),0.059041321
+361,/m/0dxrf,Friture (alimentaire),0.496444315
+362,/m/0fx9l,Four à micro-ondes,0.069656625
+363,/m/02pjr4,Mixer,0.235500246
+364,/m/02jz0l,"Robinet d'eau,robinet",0.303930074
+365,/m/0130jx,Évier (remplissage ou lavage),0.265050173
+366,/m/03dnzn,Baignoire (remplissage ou lavage),0.200963676
+367,/m/03wvsk,Sèche-cheveux,0.384524018
+368,/m/01jt3m,Chasse d'eau des toilettes,0.325801611
+369,/m/012xff,Brosse à dents,0.019311575
+370,/m/04fgwm,Brosse à dents électrique,0.1339968
+371,/m/0d31p,Aspirateur,0.19708319
+372,/m/01s0vc,Fermeture éclair (vêtements),0.06996157
+373,/m/03v3yw,Clés qui tintent,0.189677477
+374,/m/0242l,Pièce (en chute libre),0.285103798
+375,/m/01lsmm,Ciseaux,0.132798031
+376,/m/02g901,"Rasoir électrique,rasoir électrique",0.301772743
+377,/m/05rj2,Mélanger les cartes,0.070550777
+378,/m/0316dw,Dactylographie,0.554699242
+379,/m/0c2wf,Machine à écrire,0.280794621
+380,/m/01m2v,Clavier d'ordinateur,0.617722034
+381,/m/081rb,En écrivant,0.050774451
+382,/m/07pp_mv,Alarme,0.371867567
+383,/m/07cx4,Téléphone,0.354798466
+384,/m/07pp8cl,Sonnerie du téléphone,0.46751529
+385,/m/01hnzm,Sonnerie,0.174754292
+386,/m/02c8p,"Numérotation téléphonique,DTMF",0.463954329
+387,/m/015jpf,Tonalité,0.54632026
+388,/m/01z47d,Signal d'occupation,0.141894847
+389,/m/046dlr,Réveil,0.260299116
+390,/m/03kmc9,Sirène,0.243918046
+391,/m/0dgbq,Sirène de la protection civile,0.289382815
+392,/m/030rvx,Ronfleur,0.14346455
+393,/m/01y3hg,"Détecteur de fumée,avertisseur de fumée",0.321305007
+394,/m/0c3f7m,Alarme incendie,0.315309227
+395,/m/04fq5q,Corne de brume,0.071005449
+396,/m/0l156k,Siffler,0.252787769
+397,/m/06hck5,Sifflet à vapeur,0.37333259
+398,/t/dd00077,Mécanismes,0.156226665
+399,/m/02bm9n,"Cliquet,cliquet",0.212517902
+400,/m/01x3z,Horloge,0.263694137
+401,/m/07qjznt,Cocher,0.203262269
+402,/m/07qjznl,Tic-tac,0.3612324
+403,/m/0l7xg,Engrenages,0.108477362
+404,/m/05zc1,Poulies,0.018109933
+405,/m/0llzx,Machine à coudre,0.425129175
+406,/m/02x984l,ventilateur mécanique,0.076244779
+407,/m/025wky1,Climatisation,0.085429914
+408,/m/024dl,Caisse,0.212127492
+409,/m/01m4t,Imprimante,0.139732093
+410,/m/0dv5r,Caméra,0.221891642
+411,/m/07bjf,Appareil photo reflex mono-objectif,0.094002508
+412,/m/07k1x,Outils,0.270691961
+413,/m/03l9g,Marteau,0.122144006
+414,/m/03p19w,Marteau-piqueur,0.159390241
+415,/m/01b82r,Sciage,0.273562044
+416,/m/02p01q,Limage (râpe),0.242312476
+417,/m/023vsd,Ponçage,0.131467342
+418,/m/0_ksk,Outil électrique,0.27124989
+419,/m/01d380,Percer,0.327001512
+420,/m/014zdl,Explosion,0.246982485
+421,/m/032s66,"Coup de feu,coups de feu",0.274078786
+422,/m/04zjc,Mitrailleuse,0.41274935
+423,/m/02z32qm,Fusillade,0.242372468
+424,/m/0_1c,Tirs d'artillerie,0.239608631
+425,/m/073cg4,Pistolet à bouchon,0.226551458
+426,/m/0g6b5,Feux d'artifice,0.257660568
+427,/g/122z_qxw,Pétard,0.240311772
+428,/m/07qsvvw,"Éclater,éclater",0.14886722
+429,/m/07pxg6y,Éruption,0.105139807
+430,/m/07qqyl4,Boom,0.418254107
+431,/m/083vt,Bois,0.258548886
+432,/m/07pczhz,Hacher,0.130496129
+433,/m/07pl1bw,Éclat,0.044245046
+434,/m/07qs1cx,Fissure,0.100706682
+435,/m/039jq,Verre,0.167997286
+436,/m/07q7njn,"Chink,clink",0.173519179
+437,/m/07rn7sz,Briser,0.398548841
+438,/m/04k94,Liquide,0.204431549
+439,/m/07rrlb6,"Éclaboussure,éclaboussure",0.339683443
+440,/m/07p6mqd,Patauger,0.140614495
+441,/m/07qlwh6,Gargouillis,0.090667889
+442,/m/07r5v4s,Goutte,0.159935892
+443,/m/07prgkl,Verser,0.21663636
+444,/m/07pqc89,"Ruissellement,dribble",0.177726403
+445,/t/dd00088,Jet,0.101941027
+446,/m/07p7b8y,Remplir (avec du liquide),0.134252861
+447,/m/07qlf79,Pulvérisation,0.101014763
+448,/m/07ptzwd,Pompe (liquide),0.096536674
+449,/m/07ptfmf,Remuer,0.502062023
+450,/m/0dv3j,Ébullition,0.072351612
+451,/m/0790c,Sonar,0.224648193
+452,/m/0dl83,Flèche,0.133135632
+453,/m/07rqsjt,"Whoosh,swoosh,swish",0.08842659
+454,/m/07qnq_y,"Coup,coup",0.184166759
+455,/m/07rrh0c,Thunk,0.356837004
+456,/m/0b_fwt,accordeur électronique,0.174774379
+457,/m/02rr_,Unité d'effets,0.325970948
+458,/m/07m2kt,Effet de chœur,0.112906352
+459,/m/018w8,Rebond de basket-ball,0.176170349
+460,/m/07pws3f,Claquer,0.077220127
+461,/m/07ryjzk,"Claque,claque",0.146909401
+462,/m/07rdhzs,"Coup,coup",0.183542639
+463,/m/07pjjrj,"Fracassement,crash",0.161734805
+464,/m/07pc8lb,Rupture,0.343452632
+465,/m/07pqn27,Rebondir,0.026883934
+466,/m/07rbp7_,Fouet,0.115855664
+467,/m/07pyf11,Rabat,0.040026832
+468,/m/07qb_dv,Gratter,0.116082206
+469,/m/07qv4k0,Gratter,0.085538633
+470,/m/07pdjhy,Frotter,0.319610268
+471,/m/07s8j8t,Rouler,0.085861668
+472,/m/07plct2,Écrasement,0.045119323
+473,/t/dd00112,"Froissé,froissé",0.453958571
+474,/m/07qcx4z,Déchirure,0.247198448
+475,/m/02fs_r,"Bip,bip",0.207098469
+476,/m/07qwdck,Ping,0.060113803
+477,/m/07phxs1,Ding,0.259459108
+478,/m/07rv4dm,Bruit,0.09959434
+479,/m/07s02z0,Hurler,0.061658584
+480,/m/07qh7jl,Craquer,0.011485431
+481,/m/07qwyj0,Bruissement,0.062489577
+482,/m/07s34ls,Vrombissement,0.070328631
+483,/m/07qmpdm,Bruit,0.086530887
+484,/m/07p9k1k,Grésiller,0.379612952
+485,/m/07qc9xj,En cliquant,0.095380723
+486,/m/07rwm0c,Clic-clac,0.315681338
+487,/m/07phhsh,Gronder,0.088044569
+488,/m/07qyrcz,Ploc,0.383814484
+489,/m/07qfgpx,"Tintement,tintement",0.218950465
+490,/m/07rcgpl,Hum,0.195067123
+491,/m/07p78v5,Zing,0.091545887
+492,/t/dd00121,Boing,0.526967525
+493,/m/07s12q4,Croquer,0.176332623
+494,/m/028v0c,Silence,0.438278347
+495,/m/01v_m0,Onde sinusoïdale,0.230977759
+496,/m/0b9m1,Harmonique,0.027165079
+497,/m/0hdsk,Tonalité de gazouillis,0.128388375
+498,/m/0c1dj,Effet sonore,0.088372767
+499,/m/07pt_g0,Impulsion,0.023377132
+500,/t/dd00125,"À l'intérieur,petite pièce",0.289901823
+501,/t/dd00126,"À l'intérieur,grande pièce ou hall",0.110736884
+502,/t/dd00127,"À l'intérieur,espace public",0.085936405
+503,/t/dd00128,"Extérieur,urbain ou artificiel",0.152951151
+504,/t/dd00129,"Extérieur,rural ou naturel",0.130573094
+505,/m/01b9nn,Réverbération,0.068756551
+506,/m/01jnbd,Écho,0.082826756
+507,/m/096m7z,Bruit,0.113706246
+508,/m/06_y0by,bruit ambiant,0.165826917
+509,/m/07rgkc5,Statique,0.080373839
+510,/m/06xkwv,Bourdonnement du secteur,0.05315442
+511,/m/0g12c5,Distorsion,0.165851399
+512,/m/08p9q4,Effet local,0.059336774
+513,/m/07szfh9,Cacophonie,0.077936336
+514,/m/0chx_,Bruit blanc,0.131008565
+515,/m/0cj0r,Bruit rose,0.430678964
+516,/m/07p_0gm,Battement,0.233170211
+517,/m/01jwx6,Vibration,0.129959524
+518,/m/07c52,Télévision,0.085169442
+519,/m/06bz3,Radio,0.132174551
+520,/m/07hvw1,Enregistrement sur le terrain,0.051390097

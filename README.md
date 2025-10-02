@@ -2,6 +2,27 @@
 
 Demonstration application to display audio recognition
 
+# How to run
+
+Create Python virtual environment (Python 3.8 to 3.10)
+
+```shell
+# Create virtual environment
+python3 -m venv .venv
+# Activate the virtual environment
+source .venv/bin/activate
+# Install dependencies
+pip install .
+# Start capture of audio samples from microphone
+sh start_record.sh&
+# Start analysis of audio samples
+sh start_yamnet.sh&
+# Launch graphical interface
+python3 src/yamnetgui/gui.py
+```
+
+
+
 ## Project Organization
 
 - `.github/workflows`: Contains GitHub Actions used for building, testing, and publishing.
