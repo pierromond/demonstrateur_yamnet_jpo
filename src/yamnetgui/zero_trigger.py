@@ -235,7 +235,10 @@ class TriggerProcessor:
         tags_over_threshold = tags_indexes[np.nonzero(self.yamnet_classes[1][tags_indexes] <= prediction[tags_indexes])]
 
         document = {
-            "scores": dict(zip(self.yamnet_classes[0][tags_over_threshold], [float(v) for v in prediction[tags_over_threshold] - self.yamnet_classes[1][tags_over_threshold]]))
+            "scores": dict(zip(self.yamnet_classes[0][tags_over_threshold],
+                               [float(v) for v in
+                                (prediction[tags_over_threshold] - self.yamnet_classes[1][tags_over_threshold])
+                                / (1-self.yamnet_classes[1][tags_over_threshold])]))
         }
 
         if self.config.verbose:
