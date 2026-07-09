@@ -54,7 +54,7 @@ from typing import List
 import base64
 import numpy as np
 import resampy
-import tflite_runtime.interpreter as tflite
+import tensorflow.lite as tflite
 import zmq
 
 

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Cri du Vivant — Escape Game</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    background: #0a1a0a;
+    color: #a0e0a0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  h1 {
+    font-size: 3.2rem;
+    letter-spacing: 0.15em;
+    color: #60ff60;
+    text-shadow: 0 0 25px rgba(96, 255, 96, 0.4);
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 1.3rem;
+    color: #608060;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.9rem;
+    max-width: 900px;
+    width: 100%;
+  }
+
+  @media (max-width: 700px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 450px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .card {
+    background: #0d1f0d;
+    border: 2px solid #1a3a1a;
+    border-radius: 8px;
+    padding: 0.9rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card.detected {
+    background: #0a2a0a;
+    border-color: #40a040;
+    box-shadow: 0 0 15px rgba(64, 160, 64, 0.5);
+    opacity: 0.7;
+  }
+
+  .card.detected .gauge-fill { background: #40a040; }
+  .card.detected .card-name { color: #a0ffa0; }
+
+  .card.sustaining {
+    border-color: #d4a020;
+    box-shadow: 0 0 25px rgba(212, 160, 32, 0.5);
+  }
+
+  .card.winner {
+    background: #3a2500;
+    border-color: #ffc830;
+    box-shadow: 0 0 40px rgba(255, 200, 48, 0.9);
+    animation: glow-gold 0.5s ease-in-out infinite alternate;
+    opacity: 1;
+  }
+
+  .card.winner .gauge-fill { background: #ffc830; }
+  .card.winner .card-name { color: #ffe080; }
+  .card.winner .card-message { color: #ffc830; font-size: 1.3rem; font-weight: bold; }
+
+  @keyframes pulse-gold {
+    from { box-shadow: 0 0 15px rgba(212, 160, 32, 0.4); }
+    to   { box-shadow: 0 0 30px rgba(212, 160, 32, 0.9); }
+  }
+
+  @keyframes glow-gold {
+    from { box-shadow: 0 0 25px rgba(255, 200, 48, 0.5); }
+    to   { box-shadow: 0 0 55px rgba(255, 200, 48, 1); }
+  }
+
+  .card-emoji {
+    font-size: 4.5rem;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-name {
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    color: #80c080;
+  }
+
+  .card.detected .card-name { color: #a0ffa0; }
+
+  .card-index {
+    display: none;
+  }
+
+  .gauge {
+    height: 10px;
+    background: #1a2a1a;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.3rem;
+    width: 100%;
+  }
+
+  .gauge-fill {
+    height: 100%;
+    background: #40a040;
+    border-radius: 5px;
+    transition: width 0.15s linear, background 0.3s ease;
+  }
+
+  .card.winner .gauge-fill { background: #ffc830; }
+
+  .card.wrong .gauge-fill {
+    background: #c04040;
+  }
+
+  .confidence-label {
+    font-size: 1.5rem;
+    color: #60a060;
+    margin-bottom: 0.5rem;
+  }
+
+  .card.sustaining .confidence-label { color: #e0c060; }
+
+  .card-message {
+    font-size: 1.2rem;
+    color: #80a080;
+    text-align: center;
+    line-height: 1.3;
+    min-height: 2.5rem;
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+
+  .card.winner .card-message { color: #ffc830; font-size: 1.3rem; font-weight: bold; }
+
+  .status-bar {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 1.4rem;
+    min-height: 2rem;
+  }
+
+  .status-bar.success {
+    color: #ffc830;
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
+
+  .secret-display {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 4rem;
+    font-weight: bold;
+    color: #ffc830;
+    text-shadow: 0 0 30px rgba(255, 200, 48, 0.8);
+    min-height: 5rem;
+    letter-spacing: 0.3em;
+  }
+
+  .mic-status {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    font-size: 0.85rem;
+    color: #406040;
+  }
+
+  .mic-status.active { color: #60a060; }
+  .mic-status.error { color: #a04040; }
+
+  .reset-btn {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    background: transparent;
+    border: none;
+    color: #1a3a1a;
+    font-size: 0.65rem;
+    cursor: pointer;
+    opacity: 0.3;
+    z-index: 100;
+    font-family: 'Courier New', monospace;
+  }
+
+  .reset-btn:hover {
+    opacity: 0.9;
+    color: #60ff60;
+  }
+
+  .admin-hint {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    font-size: 0.7rem;
+    color: #304030;
+    opacity: 0.7;
+  }
+</style>
+</head>
+<body>
+
+<button class="reset-btn" title="Reset" onclick="location.reload()">⟳</button>
+
+<div class="mic-status" id="micStatus">🔇 Micro inactif</div>
+
+<h1>🔬 Le Cri du Vivant</h1>
+<p class="subtitle"></p>
+
+<div class="grid" id="grid"></div>
+
+<div class="secret-display" id="secretDisplay"></div>
+
+<div class="status-bar" id="statusBar"></div>
+
+<div class="admin-hint">Mode secours : double-clic sur une carte pour forcer la détection</div>
+
+<script>
+let config = null;
+let ws = null;
+let audioContext = null;
+let processor = null;
+let stream = null;
+let lastTimestamp = null;
+let unlocked = false;
+let cardElements = [];
+let sustainTimers = [];
+let detectedIndices = new Set();
+let wonAnimalIndex = -1;
+let targetCount = 5;
+let CONFIDENCE_THRESHOLD = 0.3;
+let SUSTAIN_DURATION = 0.5;
+
+const micStatus = document.getElementById('micStatus');
+const secretDisplay = document.getElementById('secretDisplay');
+const statusBar = document.getElementById('statusBar');
+const grid = document.getElementById('grid');
+
+async function init() {
+  const resp = await fetch('/config');
+  config = await resp.json();
+  CONFIDENCE_THRESHOLD = config.confidence_threshold;
+  SUSTAIN_DURATION = config.sustain_duration;
+  targetCount = config.target_detected_count;
+  sustainTimers = new Array(config.animals.length).fill(0);
+  renderCards();
+  connectWebSocket();
+  startMicrophone();
+}
+
+function renderCards() {
+  grid.innerHTML = '';
+  cardElements = config.animals.map((animal, i) => {
+    const isHuman = animal.display_name_fr === 'Humain';
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <span class="card-emoji">${animal.emoji}</span>
+      <div class="card-name">${animal.display_name_fr}</div>
+      <div class="gauge"><div class="gauge-fill" style="width:0%"></div></div>
+      <div class="confidence-label">0%</div>
+      <div class="card-message"></div>
+    `;
+
+    card.addEventListener('dblclick', () => {
+      if (unlocked) return;
+      if (isHuman) return;
+      if (detectedIndices.has(i)) return;
+      forceDetect(i);
+    });
+
+    grid.appendChild(card);
+    return {
+      el: card,
+      gaugeFill: card.querySelector('.gauge-fill'),
+      confidenceLabel: card.querySelector('.confidence-label'),
+      messageEl: card.querySelector('.card-message'),
+      isHuman: isHuman
+    };
+  });
+}
+
+function connectWebSocket() {
+  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const url = `${protocol}//${location.host}/ws`;
+  ws = new WebSocket(url);
+  ws.binaryType = 'arraybuffer';
+
+  ws.onopen = () => { console.log('WebSocket connecté'); };
+
+  ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === "scores" && !unlocked) {
+      updateUI(data.scores);
+    } else if (data.type === "unlock") {
+      showSecret(data.secret_number);
+    }
+  };
+
+  ws.onclose = () => {
+    console.log('WebSocket déconnecté, reconnexion...');
+    setTimeout(connectWebSocket, 1000);
+  };
+
+  ws.onerror = (err) => { console.error('WebSocket error', err); };
+}
+
+async function startMicrophone() {
+  try {
+    const constraints = {
+      audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+    };
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    audioContext = new (window.AudioContext || window.webkitAudioContext)({sampleRate: 16000});
+    const source = audioContext.createMediaStreamSource(stream);
+    const actualSampleRate = audioContext.sampleRate;
+
+    processor = audioContext.createScriptProcessor(4096, 1, 1);
+    processor.onaudioprocess = (event) => {
+      if (unlocked || !ws || ws.readyState !== WebSocket.OPEN) return;
+      const inputBuffer = event.inputBuffer.getChannelData(0);
+      const samples = actualSampleRate === 16000
+        ? new Float32Array(inputBuffer)
+        : downsample(inputBuffer, actualSampleRate, 16000);
+      ws.send(samples.buffer);
+    };
+
+    source.connect(processor);
+    processor.connect(audioContext.destination);
+    micStatus.textContent = '🎤 Micro actif';
+    micStatus.className = 'mic-status active';
+  } catch (err) {
+    console.error('Erreur microphone:', err);
+    micStatus.textContent = '🔇 Erreur micro: ' + err.message;
+    micStatus.className = 'mic-status error';
+  }
+}
+
+function downsample(buffer, fromRate, toRate) {
+  const ratio = fromRate / toRate;
+  const newLength = Math.round(buffer.length / ratio);
+  const result = new Float32Array(newLength);
+  for (let i = 0; i < newLength; i++) {
+    const srcIdx = i * ratio;
+    const srcFloor = Math.floor(srcIdx);
+    const srcCeil = Math.min(srcFloor + 1, buffer.length - 1);
+    const frac = srcIdx - srcFloor;
+    result[i] = buffer[srcFloor] * (1 - frac) + buffer[srcCeil] * frac;
+  }
+  return result;
+}
+
+function updateUI(scores) {
+  const now = performance.now() / 1000;
+  if (lastTimestamp === null) { lastTimestamp = now; return; }
+  const dt = now - lastTimestamp;
+  lastTimestamp = now;
+
+  for (let i = 0; i < config.animals.length; i++) {
+    const animal = config.animals[i];
+    const ce = cardElements[i];
+
+    if (ce.isHuman) {
+      const score = scores[animal.yamnet_class] || 0;
+      const pct = Math.round(score * 100);
+      ce.gaugeFill.style.width = pct + '%';
+      ce.confidenceLabel.textContent = pct + '%';
+      if (score >= CONFIDENCE_THRESHOLD) {
+        ce.messageEl.textContent = animal.trigger_message || '';
+      } else {
+        ce.messageEl.textContent = '';
+      }
+      continue;
+    }
+
+    if (detectedIndices.has(i)) continue;
+
+    const score = scores[animal.yamnet_class] || 0;
+    const pct = Math.round(score * 100);
+    ce.gaugeFill.style.width = pct + '%';
+    ce.confidenceLabel.textContent = pct + '%';
+
+    if (score >= CONFIDENCE_THRESHOLD) {
+      ce.el.classList.add('sustaining');
+      sustainTimers[i] += dt;
+      if (sustainTimers[i] >= SUSTAIN_DURATION) {
+        markDetected(i);
+      }
+    } else {
+      ce.el.classList.remove('sustaining');
+      sustainTimers[i] = Math.max(0, sustainTimers[i] - dt * 2);
+      ce.messageEl.textContent = '';
+    }
+  }
+}
+
+function markDetected(i) {
+  detectedIndices.add(i);
+  const ce = cardElements[i];
+  ce.el.classList.remove('sustaining');
+  ce.el.classList.add('detected');
+  ce.gaugeFill.style.width = '100%';
+  ce.confidenceLabel.textContent = '✓';
+  ce.messageEl.textContent = config.animals[i].trigger_message || '';
+
+  const count = detectedIndices.size;
+
+  if (count >= targetCount) {
+    wonAnimalIndex = i;
+    unlock(i);
+  } else {
+    statusBar.textContent = `${count}/${targetCount} animaux découverts`;
+    statusBar.className = 'status-bar';
+  }
+}
+
+function forceDetect(i) {
+  sustainTimers[i] = 0;
+  markDetected(i);
+}
+
+async function unlock(winnerIdx) {
+  unlocked = true;
+  const ce = cardElements[winnerIdx];
+  ce.el.classList.add('winner');
+  ce.el.classList.remove('detected');
+  ce.messageEl.textContent = config.animals[winnerIdx].win_message || '';
+  statusBar.textContent = '🎉 Bravo ! Le nombre secret est révélé !';
+  statusBar.className = 'status-bar success';
+
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  if (processor) { processor.disconnect(); processor = null; }
+  ws.send(JSON.stringify({action: "unlock"}));
+}
+
+function showSecret(number) {
+  secretDisplay.textContent = number;
+}
+
+init();
+</script>
+</body>
+</html>
