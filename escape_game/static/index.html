@@ -16,45 +16,45 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
   h1 {
-    font-size: 3.2rem;
+    font-size: 5rem;
     letter-spacing: 0.15em;
     color: #60ff60;
-    text-shadow: 0 0 25px rgba(96, 255, 96, 0.4);
-    margin-bottom: 1rem;
+    text-shadow: 0 0 40px rgba(96, 255, 96, 0.5);
+    margin-bottom: 0.5rem;
     text-align: center;
   }
 
   .subtitle {
-    font-size: 1.3rem;
+    font-size: 1.8rem;
     color: #608060;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     text-align: center;
   }
 
   .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.9rem;
-    max-width: 900px;
+    gap: 1.2rem;
+    max-width: 1300px;
     width: 100%;
   }
 
-  @media (max-width: 700px) {
+  @media (max-width: 900px) {
     .grid { grid-template-columns: repeat(3, 1fr); }
   }
-  @media (max-width: 450px) {
+  @media (max-width: 600px) {
     .grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   .card {
     background: #0d1f0d;
-    border: 2px solid #1a3a1a;
-    border-radius: 8px;
-    padding: 0.9rem;
+    border: 3px solid #1a3a1a;
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
     text-align: center;
     transition: all 0.3s ease;
     position: relative;
@@ -66,7 +66,7 @@
   .card.detected {
     background: #0a2a0a;
     border-color: #40a040;
-    box-shadow: 0 0 15px rgba(64, 160, 64, 0.5);
+    box-shadow: 0 0 20px rgba(64, 160, 64, 0.5);
     opacity: 0.7;
   }
 
@@ -75,41 +75,41 @@
 
   .card.sustaining {
     border-color: #d4a020;
-    box-shadow: 0 0 25px rgba(212, 160, 32, 0.5);
+    box-shadow: 0 0 30px rgba(212, 160, 32, 0.6);
   }
 
   .card.winner {
     background: #3a2500;
     border-color: #ffc830;
-    box-shadow: 0 0 40px rgba(255, 200, 48, 0.9);
+    box-shadow: 0 0 50px rgba(255, 200, 48, 0.9);
     animation: glow-gold 0.5s ease-in-out infinite alternate;
     opacity: 1;
   }
 
   .card.winner .gauge-fill { background: #ffc830; }
-  .card.winner .card-name { color: #ffe080; }
-  .card.winner .card-message { color: #ffc830; font-size: 1.3rem; font-weight: bold; }
+  .card.winner .card-name { color: #ffe080; font-size: 2.8rem; }
 
   @keyframes pulse-gold {
-    from { box-shadow: 0 0 15px rgba(212, 160, 32, 0.4); }
-    to   { box-shadow: 0 0 30px rgba(212, 160, 32, 0.9); }
+    from { box-shadow: 0 0 20px rgba(212, 160, 32, 0.4); }
+    to   { box-shadow: 0 0 40px rgba(212, 160, 32, 0.9); }
   }
 
   @keyframes glow-gold {
-    from { box-shadow: 0 0 25px rgba(255, 200, 48, 0.5); }
-    to   { box-shadow: 0 0 55px rgba(255, 200, 48, 1); }
+    from { box-shadow: 0 0 30px rgba(255, 200, 48, 0.5); }
+    to   { box-shadow: 0 0 70px rgba(255, 200, 48, 1); }
   }
 
   .card-emoji {
-    font-size: 4.5rem;
+    font-size: 6rem;
     display: block;
     margin-bottom: 0.4rem;
+    line-height: 1;
   }
 
   .card-name {
-    font-size: 1.7rem;
+    font-size: 2.2rem;
     font-weight: bold;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.4rem;
     color: #80c080;
   }
 
@@ -120,30 +120,27 @@
   }
 
   .gauge {
-    height: 10px;
+    height: 16px;
     background: #1a2a1a;
-    border-radius: 5px;
+    border-radius: 8px;
     overflow: hidden;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.4rem;
     width: 100%;
   }
 
   .gauge-fill {
     height: 100%;
     background: #40a040;
-    border-radius: 5px;
+    border-radius: 8px;
     transition: width 0.15s linear, background 0.3s ease;
   }
 
   .card.winner .gauge-fill { background: #ffc830; }
 
-  .card.wrong .gauge-fill {
-    background: #c04040;
-  }
-
   .confidence-label {
-    font-size: 1.5rem;
-    color: #60a060;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #60e060;
     margin-bottom: 0.5rem;
   }
 
@@ -153,34 +150,52 @@
     font-size: 1.2rem;
     color: #80a080;
     text-align: center;
-    line-height: 1.3;
-    min-height: 2.5rem;
+    line-height: 1.2;
+    min-height: 1.8rem;
     max-width: 100%;
     word-wrap: break-word;
+    margin-top: 0.2rem;
   }
 
-  .card.winner .card-message { color: #ffc830; font-size: 1.3rem; font-weight: bold; }
+  .card.detected .card-message { color: #a0ffa0; }
+  .card.sustaining .card-message { color: #e0c060; }
+  .card.winner .card-message { color: #ffc830; font-weight: bold; }
+
+  .big-message {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #c0ffc0;
+    min-height: 5rem;
+    line-height: 1.3;
+    text-shadow: 0 0 20px rgba(192, 255, 192, 0.5);
+    transition: opacity 0.5s ease;
+  }
+
+  .big-message.fade { opacity: 0.3; }
 
   .status-bar {
     margin-top: 1.5rem;
     text-align: center;
-    font-size: 1.4rem;
-    min-height: 2rem;
+    font-size: 2rem;
+    min-height: 2.5rem;
+    font-weight: bold;
   }
 
   .status-bar.success {
     color: #ffc830;
-    font-size: 1.8rem;
+    font-size: 2.8rem;
     font-weight: bold;
   }
 
   .secret-display {
     margin-top: 1rem;
     text-align: center;
-    font-size: 4rem;
+    font-size: 6rem;
     font-weight: bold;
     color: #ffc830;
-    text-shadow: 0 0 30px rgba(255, 200, 48, 0.8);
+    text-shadow: 0 0 40px rgba(255, 200, 48, 0.9);
     min-height: 5rem;
     letter-spacing: 0.3em;
   }
@@ -189,7 +204,7 @@
     position: fixed;
     top: 1rem;
     right: 1rem;
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #406040;
   }
 
@@ -203,7 +218,7 @@
     background: transparent;
     border: none;
     color: #1a3a1a;
-    font-size: 0.65rem;
+    font-size: 1rem;
     cursor: pointer;
     opacity: 0.3;
     z-index: 100;
@@ -236,6 +251,8 @@
 
 <div class="grid" id="grid"></div>
 
+<div class="big-message" id="bigMessage"></div>
+
 <div class="secret-display" id="secretDisplay"></div>
 
 <div class="status-bar" id="statusBar"></div>
@@ -261,7 +278,9 @@ let SUSTAIN_DURATION = 0.5;
 const micStatus = document.getElementById('micStatus');
 const secretDisplay = document.getElementById('secretDisplay');
 const statusBar = document.getElementById('statusBar');
+const bigMessage = document.getElementById('bigMessage');
 const grid = document.getElementById('grid');
+let messageTimer = null;
 
 async function init() {
   const resp = await fetch('/config');
@@ -394,6 +413,7 @@ function updateUI(scores) {
       ce.confidenceLabel.textContent = pct + '%';
       if (score >= CONFIDENCE_THRESHOLD) {
         ce.messageEl.textContent = animal.trigger_message || '';
+        showBigMessage(animal.trigger_message || '', 4000);
       } else {
         ce.messageEl.textContent = '';
       }
@@ -409,14 +429,15 @@ function updateUI(scores) {
 
     if (score >= CONFIDENCE_THRESHOLD) {
       ce.el.classList.add('sustaining');
+      ce.messageEl.textContent = animal.trigger_message || '';
       sustainTimers[i] += dt;
       if (sustainTimers[i] >= SUSTAIN_DURATION) {
         markDetected(i);
       }
     } else {
       ce.el.classList.remove('sustaining');
-      sustainTimers[i] = Math.max(0, sustainTimers[i] - dt * 2);
       ce.messageEl.textContent = '';
+      sustainTimers[i] = Math.max(0, sustainTimers[i] - dt * 2);
     }
   }
 }
@@ -424,11 +445,12 @@ function updateUI(scores) {
 function markDetected(i) {
   detectedIndices.add(i);
   const ce = cardElements[i];
+  const animal = config.animals[i];
   ce.el.classList.remove('sustaining');
   ce.el.classList.add('detected');
   ce.gaugeFill.style.width = '100%';
   ce.confidenceLabel.textContent = '✓';
-  ce.messageEl.textContent = config.animals[i].trigger_message || '';
+  ce.messageEl.textContent = animal.trigger_message || '';
 
   const count = detectedIndices.size;
 
@@ -436,6 +458,7 @@ function markDetected(i) {
     wonAnimalIndex = i;
     unlock(i);
   } else {
+    showBigMessage(animal.trigger_message || '', 4000);
     statusBar.textContent = `${count}/${targetCount} animaux découverts`;
     statusBar.className = 'status-bar';
   }
@@ -446,12 +469,26 @@ function forceDetect(i) {
   markDetected(i);
 }
 
+function showBigMessage(text, duration) {
+  if (messageTimer) clearTimeout(messageTimer);
+  bigMessage.textContent = text;
+  bigMessage.classList.remove('fade');
+  if (duration > 0) {
+    messageTimer = setTimeout(() => {
+      bigMessage.classList.add('fade');
+      messageTimer = setTimeout(() => { bigMessage.textContent = ''; }, 500);
+    }, duration);
+  }
+}
+
 async function unlock(winnerIdx) {
   unlocked = true;
   const ce = cardElements[winnerIdx];
+  const animal = config.animals[winnerIdx];
   ce.el.classList.add('winner');
   ce.el.classList.remove('detected');
-  ce.messageEl.textContent = config.animals[winnerIdx].win_message || '';
+  ce.messageEl.textContent = animal.win_message || '';
+  showBigMessage(animal.win_message || '', 0);
   statusBar.textContent = '🎉 Bravo ! Le nombre secret est révélé !';
   statusBar.className = 'status-bar success';
 
