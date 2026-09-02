@@ -18,7 +18,10 @@ Escape game sonore en 4 stations indépendantes pour un public scolaire (primair
   (admin de pilotage + tunnels).
 - **Stations autonomes** : dossier `EscapeGame-Standalone/` — 4 dossiers à copier sur un
   PC (lanceurs `lancer.bat` / `lancer.sh`, option Docker pour 2 d'entre elles).
-- **Accès public fixe** : `./tailscale-funnel.sh` → https://pnan-23-034.tailb0226e.ts.net
+- **Déploiement serveur (Docker, sans tunnel)** : voir
+  [`DEPLOY-SERVEUR.md`](DEPLOY-SERVEUR.md) — `docker compose up -d --build` expose les
+  4 stations par leurs ports, avec option HTTPS (Caddy + Let's Encrypt) pour le
+  micro/MIDI à distance.
 
 ## Détails par station
 
@@ -38,7 +41,9 @@ EscapeGame/
   PlaqueChladni/    Station 4 — cymatique (Node.js)
   README.md         Documentation complète
 EscapeGame-Standalone/   Dossiers autonomes prêts à copier (ZIP inclus)
-tailscale-funnel.sh     Relance de l'URL publique fixe (Tailscale Funnel)
+docker-compose.yml       Déploiement serveur (4 stations, option HTTPS)
+Caddyfile                Reverse proxy HTTPS optionnel
+DEPLOY-SERVEUR.md        Documentation du déploiement serveur
 ```
 
 ## Licence

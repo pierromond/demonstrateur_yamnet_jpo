@@ -1,0 +1,52 @@
+services:
+  # Les 4 stations, une par conteneur. Chaque station expose son port.
+  mission-silence:
+    build: ./EscapeGame/MissionSilence
+    image: escape-mission-silence
+    container_name: escape-mission-silence
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  spectro-masked:
+    build: ./EscapeGame/SpectroMasked
+    image: escape-spectro-masked
+    container_name: escape-spectro-masked
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+
+  chladni:
+    build: ./EscapeGame/Chladni
+    image: escape-chladni
+    container_name: escape-chladni
+    ports:
+      - "4500:4500"
+    restart: unless-stopped
+
+  cri-du-vivant:
+    build: ./EscapeGame/CriDuVivant
+    image: escape-cri-du-vivant
+    container_name: escape-cri-du-vivant
+    ports:
+      - "8765:8765"
+    restart: unless-stopped
+
+  # Option HTTPS : décommentez et lancez avec :
+  #   docker compose --profile https up -d
+  # avec la variable d'environnement DOMAIN=station.example.com
+  # (voir Caddyfile : sous-domaines mission.<domaine>, cri.<domaine>, ...)
+  # caddy:
+  #   image: caddy:2-alpine
+  #   profiles: ["https"]
+  #   env_file: .env.caddy
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile:ro
+  #     - caddy-data:/data
+  #   restart: unless-stopped
+
+volumes:
+  caddy-data:

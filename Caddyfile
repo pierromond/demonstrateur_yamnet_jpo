@@ -1,0 +1,20 @@
+# Reverse proxy HTTPS (optionnel) — sert les 4 stations sous des sous-domaines.
+# Usage : copier dans .env.caddy :  DOMAIN=exemple.fr
+# puis : docker compose --profile https up -d
+{$DOMAIN}
+
+mission.{$DOMAIN} {
+	reverse_proxy mission-silence:3000
+}
+
+cri.{$DOMAIN} {
+	reverse_proxy cri-du-vivant:8765
+}
+
+spectro.{$DOMAIN} {
+	reverse_proxy spectro-masked:4000
+}
+
+chladni.{$DOMAIN} {
+	reverse_proxy chladni:4500
+}

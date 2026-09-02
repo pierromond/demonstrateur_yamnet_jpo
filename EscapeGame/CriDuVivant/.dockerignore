@@ -1,0 +1,13 @@
+docs
+src
+tests
+__pycache__
+*.pyc
+.venv
+README.md
+LICENSE
+CODE_OF_CONDUCT.md
+pyproject.toml
+start_all.sh
+start_record.sh
+start_yamnet.sh

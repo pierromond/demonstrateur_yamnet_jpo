@@ -73,13 +73,18 @@ station (chacun avec son ZIP) :
 - chaque dossier a son `LISEZMOI.txt` ; prérequis : Node.js (01-03),
   Python 3.10-3.12 ou Docker (04).
 
-## Accès public
+## Déploiement serveur (Docker, sans tunnel)
 
-- **URL fixe (recommandée)** : Tailscale Funnel → https://pnan-23-034.tailb0226e.ts.net
-  (chemins : `/missionSilence/` `/criVivant/` `/spectroMasked/` `/chladni/`).
-  Relance après redémarrage : `./tailscale-funnel.sh` (racine du dépôt).
-- **URL aléatoire** : tunnel quick Cloudflare/localhost.run géré par l'admin
-  (change à chaque relance — « Nouvelle URL » dans l'admin).
+Sur un serveur avec Docker, la branche `deploy-serveur` déploie les 4 stations :
+
+```bash
+git clone https://github.com/pierromond/demonstrateur_yamnet_jpo.git
+cd demonstrateur_yamnet_jpo && git checkout deploy-serveur
+docker compose up -d --build
+```
+
+Stations sur http://IP_DU_SERVEUR:3000 / :4000 / :4500 / :8765 — option HTTPS
+(Caddy + Let's Encrypt) pour le micro/MIDI à distance. Voir `DEPLOY-SERVEUR.md`.
 
 ## Configuration de l'admin
 
