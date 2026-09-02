@@ -1,5 +1,5 @@
 # Activate the virtual environment
-source .venv/bin/activate
+source ../../.venv/bin/activate
 # Start capture of audio samples from microphone
 sh start_record.sh&
 # Start analysis of audio samples

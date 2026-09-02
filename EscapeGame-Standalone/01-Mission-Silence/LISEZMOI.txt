@@ -1,0 +1,31 @@
+MISSION SILENCE — station acoustique
+====================================
+
+LANCEMENT
+  Windows : double-cliquez sur  lancer.bat        (Node.js requis)
+  ou mieux : double-cliquez sur  lancer-docker.bat  (Docker Desktop requis,
+            tout est installe automatiquement, aucune autre installation)
+  Linux/Mac : double-cliquez sur  lancer.sh  ou  lancer-docker.sh
+  La page s'ouvre toute seule dans le navigateur.
+
+PRE-REQUIS
+  Option 1 (simple) : Docker Desktop (gratuit) : https://www.docker.com/products/docker-desktop
+  Option 2 (legere) : Node.js (gratuit) : https://nodejs.org — version LTS.
+
+UTILISATION
+  - Page : http://localhost:3000  (sur CE PC, Chrome ou Edge)
+  - Panneau animateur : touche F8 (calibration, reglages, arret/relance)
+  - Armer la mission : barre ESPACE ou F9
+  - Reinitialiser le chrono : Ctrl+Alt+D
+  - Mode demo : F10
+
+CONFIGURATION (fichier config.json)
+  word : le mot a trouver dans la salle
+  code : le code 4 chiffres affiche en cas de reussite
+  thresholdDb / explodeThresholdDb : seuils de bruit (dB)
+  timeLimitMs : duree de la mission (300000 = 5 min)
+
+ASTUCES
+  - Le micro ne marche qu'en http://localhost (ou https) : ne pas ouvrir
+    la page depuis une autre machine en IP locale.
+  - Le volume et le niveau du micro se reglent dans le panneau F8.

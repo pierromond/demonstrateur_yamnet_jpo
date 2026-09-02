@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Notice animateur — Mission Silence</title>
+<style>
+  @page { size: A4 portrait; margin: 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #111; font-size: 11pt; }
+  h1 { font-size: 20pt; margin-bottom: 2mm; }
+  h2 { font-size: 14pt; margin: 6mm 0 2mm; border-bottom: 1.5px solid #111; padding-bottom: 1mm; }
+  table { border-collapse: collapse; width: 100%; margin: 3mm 0; }
+  th, td { border: 1px solid #888; padding: 2.5mm 3mm; text-align: left; font-size: 10.5pt; }
+  th { background: #eee; }
+  ol, ul { margin-left: 6mm; }
+  li { margin-bottom: 1.5mm; }
+  .warn { background: #fdecea; border-left: 4px solid #e74c3c; padding: 3mm 4mm; margin: 3mm 0; }
+  .tip { background: #eafaf1; border-left: 4px solid #2ecc71; padding: 3mm 4mm; margin: 3mm 0; }
+  .check { list-style: none; margin-left: 0; }
+  .check li::before { content: "☐ "; font-weight: 700; }
+</style>
+</head>
+<body>
+  <h1>NOTICE ANIMATEUR — MISSION SILENCE</h1>
+  <p>Station acoustique : les enfants cherchent des indices en silence, découvrent le mot à taper
+  (TOUCHE par défaut), obtiennent un code 4 chiffres et le notent sur leur fiche. Tout bruit trop fort
+  fait échouer la mission (l'ordinateur « se brouille et explose » si le cri est très fort).</p>
+
+  <h2>1. Démarrage</h2>
+  <ol>
+    <li>Brancher le micro USB, le placer à mi-salle sur un support stable, loin des bouches d'air.</li>
+    <li>PC sur secteur ; désactiver la mise en veille et les sons système.</li>
+    <li>Ouvrir un terminal dans le dossier : <b>node server.js</b></li>
+    <li>Ouvrir <b>http://localhost:3000</b> (Chrome, Edge ou Firefox), autoriser le micro, plein écran (F11).</li>
+    <li>Calibrer (F8 → panneau animateur) : mesurer le silence (3 s), puis taper des mains près du micro.</li>
+    <li>Téléphone de l'animateur (même WiFi) : <b>http://IP-du-PC:3000/admin</b> (PIN = adminPin de config.json).</li>
+  </ol>
+
+  <h2>2. Déroulé d'une session (~10-15 min)</h2>
+  <ol>
+    <li>Briefing à la porte : mission + « le bruit fait disparaître le code » (affiche poster-porte).</li>
+    <li>Démo (F10) : taper des mains, chuchoter, crier → lire les dB à l'écran. (2 min, pédagogique.)</li>
+    <li>F9 (ou bouton Armer du téléphone) : compte à rebours, la recherche commence.</li>
+    <li>Échec = écran rouge « Retournez à la porte ! » → quand les enfants sont revenus, F9 relance.</li>
+    <li>Code trouvé = affiché 30 s : les enfants le notent sur la fiche-code.</li>
+    <li>Échap (ou Stop) : retour à l'écran de repos pour le groupe suivant.</li>
+  </ol>
+
+  <h2>3. Raccourcis clavier (PC) et télécommande</h2>
+  <table>
+    <tr><th>Touche / bouton</th><th>Action</th></tr>
+    <tr><td>F8</td><td>Panneau animateur (calibration, seuils, code, mot)</td></tr>
+    <tr><td>F9</td><td>Armer / relancer la mission</td></tr>
+    <tr><td>F10</td><td>Mode démo (aucun échec possible)</td></tr>
+    <tr><td>Échap</td><td>Retour à l'écran de repos</td></tr>
+    <tr><td>Téléphone</td><td>Armer / Relancer, Démo, Stop, seuils ±1 dB, code de session ; vibration sur échec</td></tr>
+  </table>
+
+  <h2>4. Réglages recommandés</h2>
+  <ul>
+    <li>Seuil d'échec : <b>55 dB</b> (conversation = 60 dB échoue, chuchotement = 30 dB passe).</li>
+    <li>Seuil d'explosion : <b>80 dB</b> (cri/applaudissement → l'écran se brouille et « explose »).</li>
+    <li>Durée de dépassement avant échec : 1 s (évite les faux positifs).</li>
+    <li>Code de session : changez-le pour chaque groupe (4 chiffres).</li>
+  </ul>
+  <div class="tip"><b>Conseil :</b> testez le seuil en conditions réelles avant l'arrivée des enfants :
+  un adulte chuchote à la porte, un autre tape des mains au fond. Ajustez avec ±1 dB si besoin.</div>
+
+  <h2>5. Checklist d'installation</h2>
+  <ul class="check">
+    <li>Micro USB branché et positionné à mi-salle</li>
+    <li>Écran visible de la porte, plein écran</li>
+    <li>Calibration faite (silence + claquement)</li>
+    <li>Télécommande testée sur le téléphone</li>
+    <li>Affiche échelle dB collée dans la salle</li>
+    <li>Briefing collé à la porte</li>
+    <li>4 indices cachés (rébus, mot, avertissements)</li>
+    <li>Fiches code imprimées pour les enfants</li>
+    <li>Essai à blanc complet effectué</li>
+  </ul>
+
+  <div class="warn"><b>Jamais de bips :</b> l'application ne fait aucun son (le silence est le jeu).
+  Désactivez aussi les sons de frappe du clavier du PC.</div>
+</body>
+</html>

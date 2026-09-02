@@ -1,0 +1,18 @@
+{
+  "port": 4000,
+  "sounds": [
+    { "name": "AutreChose", "file": "Code.wav", "key": "a", "midi": 34 },
+    { "name": "Sinus", "file": "demo1_sine_direct.wav", "key": "z", "midi": 21 },
+    { "name": "Bruit blanc", "file": "demo3_white_noise.wav", "key": "e", "midi": 24 },
+    { "name": "Image audio", "file": "imagetoaudio.wav", "key": "r", "midi": 28 },
+    { "name": "Open hats", "file": "openhats(1).wav", "key": "t", "midi": 51 },
+    { "name": "Open hats 2", "file": "openhats.wav", "key": "y", "midi": 54 },
+    { "name": "Chants troglodytes", "file": "Troglodytes_songs.wav", "key": "u", "midi": 58 },
+    { "name": "Vague", "file": "Wave.wav", "key": "i", "midi": 63 }
+  ],
+  "pads": [
+    { "note": 11, "vel": 21, "color": "#00ff00", "label": "Rang 1 · Colonne 1" },
+    { "note": 81, "vel": 6, "color": "#ff0000", "label": "Rang 8 · Colonne 1" },
+    { "note": 88, "vel": 39, "color": "#0000ff", "label": "Rang 8 · Colonne 8" }
+  ]
+}

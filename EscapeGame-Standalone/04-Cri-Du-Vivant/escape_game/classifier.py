@@ -21,7 +21,8 @@ class YamnetClassifier:
 
         csv_path = os.path.join(os.path.dirname(__file__), "yamnet_class_threshold_map.csv")
         if not os.path.exists(csv_path):
-            csv_path = "/home/aumond/Documents/github/demonstrateur_escape_game/src/yamnetgui/resources/yamnet_class_threshold_map.csv"
+            csv_path = os.path.join(os.path.dirname(__file__), "..", "src",
+                                    "yamnetgui", "resources", "yamnet_class_threshold_map.csv")
         self.class_names = self._load_class_names(csv_path)
 
         self.sos = None

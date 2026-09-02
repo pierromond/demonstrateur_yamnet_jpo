@@ -1,0 +1,31 @@
+SPECTRO MASKED — declencheur de sons (clavier / Launchpad)
+==========================================================
+
+LANCEMENT
+  Windows : double-cliquez sur  lancer.bat
+  Linux/Mac : double-cliquez sur  lancer.sh  (ou : ./lancer.sh)
+  La page s'ouvre toute seule dans le navigateur.
+
+PRE-REQUIS
+  Node.js (gratuit) : https://nodejs.org — version LTS.
+  Launchpad MK2 branche en USB + Chrome ou Edge (pas Firefox).
+
+UTILISATION
+  - Page : http://localhost:4000  (sur CE PC, Chrome ou Edge)
+  - Cliquez sur « Activer l'audio », puis « Reessayer MIDI » si besoin :
+    Chrome demande l'autorisation MIDI -> « Autoriser ».
+  - Les 3 pads de coin s'allument (vert bas gauche, rouge haut gauche,
+    bleu haut droite). Les autres pads declenchent les sons :
+    col 4 rang 3 = son « AutreChose » (sans LED), les 7 autres sons
+    sur leurs pads (voir la table de la page).
+  - Les touches clavier a z e r t y u i declenchent aussi les sons.
+
+CONFIGURATION (fichier config.json)
+  sounds : fichiers audio, note MIDI (note = 10 x (rang-1) + colonne + 10),
+           touche clavier.
+  pads : pads de couleur (note + vel = couleur du Launchpad).
+  Le dossier audio/ contient les fichiers .wav : remplacez-les au besoin.
+
+ASTUCES
+  - Le MIDI ne marche que sur CE PC (local) : pas depuis une autre machine.
+  - Rechargez la page (Ctrl+Shift+R) apres un changement de config.

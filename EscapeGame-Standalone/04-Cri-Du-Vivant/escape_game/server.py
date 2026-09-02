@@ -10,7 +10,7 @@ from classifier import YamnetClassifier
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "yamnet.tflite")
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "yamnet.tflite")
 
 with open(CONFIG_PATH) as f:
     config = json.load(f)
@@ -31,7 +31,7 @@ async def root():
 
 @app.get("/config")
 async def get_config():
-    safe_config = {k: v for k, v in config.items() if k not in ("secret_number", "server")}
+    safe_config = {k: v for k, v in config.items() if k not in ("code", "server")}
     return JSONResponse(safe_config)
 
 
@@ -76,9 +76,9 @@ async def websocket_endpoint(ws: WebSocket):
             elif "text" in data:
                 msg = json.loads(data["text"])
                 if msg.get("action") == "unlock":
-                    await ws.send_json({"type": "unlock", "secret_number": config["secret_number"]})
+                    await ws.send_json({"type": "unlock", "code": config["code"]})
                 elif msg.get("action") == "force_unlock":
-                    await ws.send_json({"type": "unlock", "secret_number": config["secret_number"]})
+                    await ws.send_json({"type": "unlock", "code": config["code"]})
 
     except WebSocketDisconnect:
         pass

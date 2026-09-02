@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escape Game — Pilotage</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0b1020; --panel: #131a30; --ok: #2ecc71; --warn: #f1c40f;
+    --danger: #e74c3c; --text: #ecf0f1; --muted: #8fa1b3;
+  }
+  body { background: var(--bg); color: var(--text); font-family: "Segoe UI", Arial, sans-serif; padding: 16px; }
+  .hidden { display: none !important; }
+
+  #pinGate { position: fixed; inset: 0; display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; }
+  #pinGate h1 { font-size: 1.6rem; color: var(--warn); }
+  #pinInput { padding: 12px; font-size: 1.4rem; text-align: center; border-radius: 10px; border: 1px solid #2a3a55; background: #0e1526; color: var(--text); width: 180px; letter-spacing: .3em; }
+  #pinError { color: var(--danger); font-size: .9rem; }
+  button { padding: 10px 14px; border: none; border-radius: 10px; background: #2a3a55; color: var(--text); font-size: .95rem; font-weight: 700; cursor: pointer; }
+  button:hover { background: #36507a; }
+  button:disabled { opacity: .45; cursor: default; }
+  .btn-ok { background: #1d6b34; } .btn-ok:hover { background: #258a43; }
+  .btn-danger { background: #6b1d1d; } .btn-danger:hover { background: #8a2525; }
+  .btn-warn { background: #4d3f00; } .btn-warn:hover { background: #6b5700; }
+
+  #app { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+
+  header { display: flex; flex-direction: column; gap: 8px; }
+  header h1 { font-size: 1.3rem; letter-spacing: 1px; }
+  header .sub { color: var(--muted); font-size: .9rem; }
+  .adminurl { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--panel); border: 1px solid #2a3a55; border-radius: 12px; padding: 10px 14px; }
+  .adminurl a { color: var(--ok); font-weight: 700; word-break: break-all; }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .actions button { flex: 1; min-width: 140px; }
+
+  .card { background: var(--panel); border: 1px solid #2a3a55; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .card .head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .card .head h2 { font-size: 1.1rem; }
+  .card .desc { color: var(--muted); font-size: .85rem; }
+
+  .badge { padding: 5px 12px; border-radius: 8px; font-weight: 900; font-size: .85rem; letter-spacing: .5px; background: #1e2438; color: var(--muted); white-space: nowrap; }
+  .badge.online { background: #1e4620; color: var(--ok); }
+  .badge.starting, .badge.restarting { background: #4d3f00; color: var(--warn); animation: blink 1.2s infinite; }
+  .badge.crashed, .badge.unreachable { background: #5b1d1d; color: #ff8a8a; animation: blink 1s infinite; }
+  .badge.tunnel-online { background: #1e3a5b; color: #5ab0ff; }
+  @keyframes blink { 50% { opacity: .5; } }
+
+  .urls { display: flex; flex-direction: column; gap: 4px; font-size: .92rem; color: var(--muted); }
+  .urls a { color: var(--ok); font-weight: 700; word-break: break-all; }
+  .urls .local a { color: #5ab0ff; font-weight: 600; }
+
+  .meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: .9rem; color: var(--muted); }
+  .meta b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .controls button { min-width: 110px; }
+  .autorestart { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--muted); cursor: pointer; }
+
+  .logwrap { border-top: 1px solid #2a3a55; padding-top: 10px; }
+  .logtoggle { background: none; border: 1px solid #2a3a55; padding: 5px 10px; font-size: .85rem; }
+  pre.log { background: #0a0f1e; border: 1px solid #1c2942; border-radius: 8px; padding: 10px; font-size: .78rem; line-height: 1.45; max-height: 260px; overflow: auto; color: #9fb4c8; white-space: pre-wrap; word-break: break-word; margin-top: 8px; }
+  pre.log .tunnel-line { color: #7a8fa8; }
+
+  .hint { font-size: .85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div id="pinGate">
+  <h1>Escape Game — Pilotage</h1>
+  <input id="pinInput" type="password" inputmode="text" maxlength="32" placeholder="PIN" autocomplete="off">
+  <button id="pinGo" type="button">Se connecter</button>
+  <p id="pinError" class="hidden">PIN incorrect.</p>
+</div>
+
+<main id="app" class="hidden">
+  <header>
+    <h1>🕹️ Escape Game — Pilotage</h1>
+    <p class="sub">Gestion des plateformes Mission Silence et Le Cri du Vivant (processus + tunnels Cloudflare).</p>
+    <div class="adminurl">
+      <span class="hint">Administration (lien à garder secret) :</span>
+      <a id="adminUrl" href="#" target="_blank" rel="noopener">connexion…</a>
+      <button id="btnAdminTunnel" class="btn-warn" type="button">Nouvelle URL</button>
+    </div>
+  </header>
+
+  <div class="actions">
+    <button id="btnAllStart" class="btn-ok" type="button">Tout démarrer</button>
+    <button id="btnAllStop" class="btn-danger" type="button">Tout arrêter</button>
+  </div>
+
+  <div id="cards"></div>
+</main>
+
+<script>
+const PIN_KEY = "escapeAdminPin";
+let pin = sessionStorage.getItem(PIN_KEY) || "";
+let statusData = null;
+const openLogs = new Set();
+
+const $ = (id) => document.getElementById(id);
+
+const STATUS_LABEL = {
+  online: "En ligne", starting: "Démarrage…", restarting: "Redémarrage…",
+  stopped: "Arrêté", unreachable: "Injoignable"
+};
+const TUNNEL_LABEL = {
+  online: "tunnel actif", connecting: "tunnel : connexion…",
+  restarting: "tunnel : relance…", off: "tunnel arrêté"
+};
+
+function fmtUptime(s) {
+  if (s == null) return "—";
+  const m = Math.floor(s / 60), r = s % 60;
+  if (m === 0) return r + " s";
+  if (m < 60) return m + " min " + r + " s";
+  return Math.floor(m / 60) + " h " + (m % 60) + " min";
+}
+
+function badge(kind, label) {
+  return '<span class="badge ' + kind + '">' + label + "</span>";
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function cardHTML(a) {
+  const statusCls = a.status === "stopped" ? "" : a.status;
+  const tunnelCls = a.tunnel === "online" ? "tunnel-online" : (a.tunnel === "off" ? "" : a.tunnel);
+  const urlHTML = a.url
+    ? '<span>🌐 <a href="' + esc(a.url) + '" target="_blank" rel="noopener">' + esc(a.url) + "</a></span>"
+    : '<span>🌐 pas d\u2019URL publique</span>';
+  const tunnelBadge = a.tunnel === "off" ? "" : badge(tunnelCls, TUNNEL_LABEL[a.tunnel] || a.tunnel);
+  const adminLinkHTML = a.adminLink
+    ? '<span>🎛️ <a href="' + esc(a.adminLink.url) + '" target="_blank" rel="noopener">' + esc(a.adminLink.label) + "</a></span>"
+    : "";
+  return (
+    '<div class="card" id="card-' + esc(a.id) + '">' +
+      '<div class="head">' +
+        "<div><h2>" + esc(a.name) + '</h2><span class="desc">' + esc(a.description) + "</span></div>" +
+        '<div style="display:flex;gap:8px;align-items:center">' +
+          badge(statusCls, STATUS_LABEL[a.status] || a.status) +
+          tunnelBadge +
+        "</div>" +
+      "</div>" +
+      '<div class="urls">' + urlHTML + adminLinkHTML +
+        '<span class="local">💻 local : <a href="' + esc(a.localUrl) + '" target="_blank" rel="noopener">' + esc(a.localUrl) + "</a></span>" +
+      "</div>" +
+      '<div class="meta">' +
+        "<span>Port : <b>" + a.port + "</b></span>" +
+        "<span>Actif depuis : <b>" + fmtUptime(a.uptime) + "</b></span>" +
+        "<span>Redémarrages : <b>" + a.restarts + "</b></span>" +
+        "<span>Santé : <b>" + (a.health.ok === true ? "ok" : a.health.ok === false ? "hors ligne" : "—") + "</b></span>" +
+      "</div>" +
+      '<div class="controls">' +
+        '<button data-act="start" data-id="' + esc(a.id) + '" class="btn-ok" ' + (a.status !== "stopped" ? "disabled" : "") + ">Démarrer</button>" +
+        '<button data-act="restart" data-id="' + esc(a.id) + '" class="btn-warn" ' + (a.status === "stopped" ? "disabled" : "") + ">Redémarrer</button>" +
+        '<button data-act="stop" data-id="' + esc(a.id) + '" class="btn-danger" ' + (a.status === "stopped" ? "disabled" : "") + ">Arrêter</button>" +
+        '<label class="autorestart"><input type="checkbox" data-act="autorestart" data-id="' + esc(a.id) + '"' + (a.autoRestart ? " checked" : "") + "> relance auto si crash</label>" +
+        '<button data-act="togglelog" data-id="' + esc(a.id) + '" class="logtoggle">Journaux</button>' +
+      "</div>" +
+      '<div class="logwrap' + (openLogs.has(a.id) ? "" : " hidden") + '" data-log="' + esc(a.id) + '"><pre class="log"></pre></div>' +
+    "</div>"
+  );
+}
+
+async function api(path, method, body) {
+  const opts = { method: method || "GET" };
+  if (body) {
+    opts.headers = { "Content-Type": "application/json" };
+    opts.body = JSON.stringify(body);
+  }
+  const res = await fetch(path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || ("HTTP " + res.status));
+  return data;
+}
+
+async function doAction(path, withPin) {
+  try {
+    await api(path, "POST", withPin ? { pin } : {});
+    if (withPin) sessionStorage.setItem(PIN_KEY, pin);
+  } catch (err) {
+    if (withPin && err.message.includes("pin")) {
+      alert("PIN incorrect");
+    } else {
+      alert("Erreur : " + err.message);
+    }
+  }
+}
+
+async function refresh() {
+  try {
+    statusData = await api("/api/status");
+  } catch (err) {
+    return;
+  }
+  const admin = statusData.admin;
+  const aEl = $("adminUrl");
+  if (admin.url) {
+    aEl.href = admin.url;
+    aEl.textContent = admin.url;
+  } else {
+    aEl.href = "#";
+    aEl.textContent = "tunnel non démarré…";
+  }
+  $("cards").innerHTML = statusData.apps.map(cardHTML).join("");
+}
+
+async function refreshLogs(id) {
+  const wrap = document.querySelector('[data-log="' + id + '"]');
+  if (!wrap || wrap.classList.contains("hidden")) return;
+  try {
+    const data = await api("/api/logs?id=" + encodeURIComponent(id) + "&n=150");
+    const appLines = (data.lines || []).map(esc);
+    const tunnelLines = (data.tunnel || []).map((l) => '<span class="tunnel-line">' + esc(l) + "</span>");
+    wrap.querySelector("pre").innerHTML = appLines.concat(tunnelLines).join("\n");
+    const pre = wrap.querySelector("pre");
+    pre.scrollTop = pre.scrollHeight;
+  } catch (err) { /* ignore */ }
+}
+
+$("pinGo").addEventListener("click", async () => {
+  pin = $("pinInput").value || "";
+  sessionStorage.setItem(PIN_KEY, pin);
+  $("pinGate").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  refresh();
+});
+
+$("pinInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("pinGo").click(); });
+
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest("button[data-act]");
+  if (!btn) return;
+  const act = btn.dataset.act, id = btn.dataset.id;
+  if (act === "togglelog") {
+    const wrap = document.querySelector('[data-log="' + id + '"]');
+    if (openLogs.has(id)) {
+      openLogs.delete(id);
+      wrap.classList.add("hidden");
+    } else {
+      openLogs.add(id);
+      wrap.classList.remove("hidden");
+      refreshLogs(id);
+    }
+    return;
+  }
+  if (act === "start" || act === "stop" || act === "restart") {
+    await doAction("/api/app/" + id + "/" + act, true);
+    refresh();
+  }
+});
+
+document.addEventListener("change", async (e) => {
+  const cb = e.target.closest("input[data-act=autorestart]");
+  if (!cb) return;
+  await doAction("/api/app/" + cb.dataset.id + "/autorestart", true);
+});
+
+$("btnAllStart").addEventListener("click", async () => {
+  await doAction("/api/all/start", true);
+  refresh();
+});
+$("btnAllStop").addEventListener("click", async () => {
+  await doAction("/api/all/stop", true);
+  refresh();
+});
+$("btnAdminTunnel").addEventListener("click", async () => {
+  await doAction("/api/admin/tunnel/restart", true);
+});
+
+setInterval(() => {
+  if ($("app").classList.contains("hidden")) return;
+  refresh();
+  openLogs.forEach(refreshLogs);
+}, 2500);
+
+(async function init() {
+  try {
+    await api("/api/status");
+    if (pin) {
+      $("pinGate").classList.add("hidden");
+      $("app").classList.remove("hidden");
+      refresh();
+    }
+  } catch (err) { /* ignore */ }
+})();
+</script>
+</body>
+</html>

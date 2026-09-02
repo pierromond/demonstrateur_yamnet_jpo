@@ -1,0 +1,42 @@
+{
+  "animals": [
+    {"yamnet_class": "Speech", "display_name_fr": "Humain", "emoji": "🧑", "yamnet_index": 0,
+     "trigger_message": "C'est un humain que j'entends ? Non, non… L'humain n'est pas la réponse à mon énigme."},
+    {"yamnet_class": "Meow", "display_name_fr": "Chat", "emoji": "🐱", "yamnet_index": 78},
+    {"yamnet_class": "Bark", "display_name_fr": "Chien", "emoji": "🐶", "yamnet_index": 70},
+    {"yamnet_class": "Sheep", "display_name_fr": "Mouton", "emoji": "🐑", "yamnet_index": 92},
+    {"yamnet_class": "Owl", "display_name_fr": "Hibou", "emoji": "🦉", "yamnet_index": 114},
+    {"yamnet_class": "Oink", "display_name_fr": "Cochon", "emoji": "🐷", "yamnet_index": 89},
+    {"yamnet_class": "Duck", "display_name_fr": "Canard", "emoji": "🦆", "yamnet_index": 99},
+    {"yamnet_class": "Roaring cats (lions, tigers)", "display_name_fr": "Lion", "emoji": "🦁", "yamnet_index": 104},
+    {"yamnet_class": "Howl", "display_name_fr": "Loup", "emoji": "🐺", "yamnet_index": 72},
+    {"yamnet_class": "Cricket", "display_name_fr": "Grillon", "emoji": "🦗", "yamnet_index": 122},
+    {"yamnet_class": "Pigeon, dove", "display_name_fr": "Pigeon", "emoji": "🕊️", "yamnet_index": 110},
+    {"yamnet_class": "Bee, wasp, etc.", "display_name_fr": "Abeille", "emoji": "🐝", "yamnet_index": 126}
+  ],
+  "confidence_threshold": 0.15,
+  "human_threshold": 0.5,
+  "sustain_duration": 0.5,
+  "code": "6745",
+  "rounds": [
+    {"yamnet_class": "Oink", "display_name_fr": "Cochon",
+     "riddle": "Je suis rose, je grogne et je me roule dans la boue. Qui suis-je ?",
+     "threshold": 0.15, "assist": "full"},
+    {"yamnet_class": "Bark", "display_name_fr": "Chien",
+     "riddle": "Je suis le meilleur ami de l'humain et mon cri fait « ouaf ouaf ». Qui suis-je ?",
+     "threshold": 0.2, "assist": "bar"},
+    {"yamnet_class": "Sheep", "display_name_fr": "Mouton",
+     "riddle": "Mon manteau de laine se transforme en pull. Qui suis-je ?",
+     "threshold": 0.25, "assist": "none"},
+    {"yamnet_class": "Howl", "display_name_fr": "Loup",
+     "riddle": "Quand la lune se lève, ma meute et moi chantons en chœur. Qui suis-je ?",
+     "threshold": 0.3, "assist": "none"}
+  ],
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8765,
+    "yamnet_window_seconds": 0.96,
+    "yamnet_hop_seconds": 0.48,
+    "yamnet_sample_rate": 16000
+  }
+}

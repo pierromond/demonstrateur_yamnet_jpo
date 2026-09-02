@@ -1,0 +1,38 @@
+LE CRI DU VIVANT — reconnaissance sonore (YAMNet)
+==================================================
+
+LANCEMENT
+  Windows : double-cliquez sur  lancer-docker.bat  (RECOMMANDE : Docker Desktop,
+            tout est installe automatiquement, aucune autre installation)
+            ou  lancer.bat  si vous preferez Python direct.
+  Linux/Mac : double-cliquez sur  lancer-docker.sh  ou  lancer.sh
+  Premiere utilisation : l'image Docker se construit toute seule
+  (5 a 10 minutes, internet requis). Ensuite la page s'ouvre toute seule.
+
+PRE-REQUIS
+  Option 1 (RECOMMANDE) : Docker Desktop (gratuit) : https://www.docker.com/products/docker-desktop
+  Option 2 : Python 3.10 a 3.12 (gratuit) : https://python.org
+  Windows : cochez « Add python.exe to PATH » lors de l'installation.
+  Ubuntu : si la creation de l'environnement echoue, installez d'abord :
+           sudo apt install python3-venv
+
+UTILISATION
+  - Page : http://localhost:8765  (sur CE PC, Chrome ou Edge)
+  - Autorisez le micro dans le navigateur.
+  - Les enfants doivent imiter le cri de l'animal de l'enigme :
+    1. Cochon   (facile — barre de proximite + seuil visibles)
+    2. Chien
+    3. Mouton   (barre masquee)
+    4. Loup     (plus difficile)
+  - Tous les animaux trouves : le code secret s'affiche.
+
+CONFIGURATION (fichier escape_game/config.json)
+  rounds : ordre, enigmes, seuil et aide (full / bar / none)
+  animals : classes YAMNet, noms et emojis ; trigger_message = message
+            quand une voix humaine est detectee.
+  code : le code secret affiche a la fin.
+
+ASTUCES
+  - Le micro ne marche qu'en http://localhost (ou https) : pas depuis
+    une autre machine en IP locale.
+  - Double-clic sur l'enigme (mode secours) : resout l'enigme en cours.

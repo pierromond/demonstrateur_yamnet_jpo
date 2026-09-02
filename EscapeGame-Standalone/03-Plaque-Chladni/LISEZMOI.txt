@@ -1,0 +1,22 @@
+PLAQUE DE CHLADNI — cymatique
+=============================
+
+LANCEMENT
+  Windows : double-cliquez sur  lancer.bat
+  Linux/Mac : double-cliquez sur  lancer.sh  (ou : ./lancer.sh)
+  La page s'ouvre toute seule dans le navigateur.
+
+PRE-REQUIS
+  Node.js (gratuit) : https://nodejs.org — version LTS.
+
+UTILISATION
+  - Page : http://localhost:4500
+  - Boutons + et - (ou fleches du clavier) : un pas = une frequence.
+  - Le balayage ne s'arrete que sur les frequences de resonance
+    de la plaque (voir config.json -> frequencies).
+  - Bouton « Sonner » : joue la frequence (enceintes sous la plaque).
+
+CONFIGURATION (fichier config.json)
+  frequencies : la liste exacte des frequences parcourues (Hz).
+  references : exemples sonores affiches (emoji + etiquette).
+  Exemple : { "frequency": 96, "emoji": "...", "label": "..." }

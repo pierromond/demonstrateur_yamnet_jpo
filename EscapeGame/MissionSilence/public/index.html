@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Silence — Station Acoustique</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<button id="btnStart" class="start-overlay" type="button">
+  <span class="start-title">MISSION SILENCE</span>
+  <span class="start-sub">Cliquez pour activer le micro</span>
+</button>
+
+<div id="micError" class="start-overlay hidden">
+  <span class="start-title">Micro indisponible</span>
+  <span class="start-sub">Autorisez le micro du navigateur puis rechargez la page.<br>Ouvrez bien http://localhost:PORT (pas l'adresse IP).</span>
+</div>
+
+<main id="app" class="hidden">
+
+  <!-- État repos -->
+  <section id="scrIdle" class="screen">
+    <div class="idle-lock" aria-hidden="true">
+      <div class="lock-shackle"></div>
+      <div class="lock-body">
+        <div class="lock-hole"></div>
+      </div>
+    </div>
+    <h1>CODE 4 CHIFFRES</h1>
+    <p class="idle-sub">La station acoustique est verrouillée.<br>Un mot dort dans la salle pour la réveiller…</p>
+    <div class="gauge-wrap">
+      <div class="db-readout"><span id="idleDb">--</span><span class="db-unit">dB</span></div>
+      <div id="gaugeIdle" class="gauge-wrap"></div>
+    </div>
+  </section>
+
+  <!-- Compte à rebours -->
+  <section id="scrCountdown" class="screen hidden">
+    <div id="cdNumber" class="countdown-number">3</div>
+    <p class="countdown-sub">Préparez-vous… silence total !</p>
+  </section>
+
+  <!-- Recherche -->
+  <section id="scrSearch" class="screen hidden">
+    <div class="search-top">
+      <div class="search-timer">
+        <div id="searchTimer">5:00</div>
+        <div class="timer-label">restantes</div>
+        <span id="timePenalty" class="time-penalty hidden">-10 s</span>
+      </div>
+      <div class="search-attempt">Tentative n°<span id="attemptNum">1</span></div>
+    </div>
+    <div class="db-readout big"><span id="searchDb">--</span><span class="db-unit">dB</span></div>
+    <div id="gaugeSearch" class="gauge-wrap"></div>
+    <div id="noiseWarning" class="noise-warning hidden">ATTENTION… CHUUUT !</div>
+    <p class="search-hint">Traversez la salle en silence. Trouvez le mot, puis tapez-le ici :</p>
+    <div class="word-entry-wrap">
+      <input id="wordEntry" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+             class="word-entry" maxlength="20" placeholder="tapez le mot…" aria-label="Mot à taper">
+      <div id="wordBoxes" class="word-boxes" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- Explosion (brouillage) -->
+  <section id="scrExplode" class="screen hidden">
+    <div class="glitch-noise" aria-hidden="true"></div>
+    <div class="explode-fx" aria-hidden="true"></div>
+    <div id="explodePhase" class="explode-phase">
+      <h1 class="explode-title">BZZZT !</h1>
+      <p class="explode-sub">Système brouillé…</p>
+    </div>
+  </section>
+
+  <!-- Temps écoulé : 3 chiffres sur 4 -->
+  <section id="scrTimeout" class="screen hidden">
+    <h1 class="timeout-title">DÉSOLÉ !</h1>
+    <p class="timeout-sub">Le temps est écoulé… Vous n'aurez que 3 chiffres sur 4 :</p>
+    <div id="timeoutDigits" class="code-digits">- - - ?</div>
+    <p class="timeout-countdown">Ces chiffres s'effacent dans <span id="timeoutCountdown">30</span> s</p>
+  </section>
+
+  <!-- Succès -->
+  <section id="scrSuccess" class="screen hidden">
+    <h1 class="success-title">MISSION ACCOMPLIE</h1>
+    <p class="success-attempt">Tentative n°<span id="successAttempt">1</span></p>
+    <p class="success-sub">Le code secret :</p>
+    <div id="codeDigits" class="code-digits">- - - -</div>
+    <p class="success-countdown">L'écran se verrouille dans <span id="codeCountdown">30</span> s — notez le code !</p>
+    <p id="successStats" class="success-stats"></p>
+    <p class="success-door">🔴 Frapper à la porte suivante et attendez un petit peu, quelqu'un va vous ouvrir la porte !</p>
+    <div class="info-box">
+      <h2>📖 Le saviez-vous ? — Le décibel (dB)</h2>
+      <p>Le <b>0 dB n'est pas le silence absolu</b> : c'est une simple référence, le seuil
+      d'audition théorique de l'oreille humaine (20 micropascals de pression sonore).
+      Le silence absolu n'existe pas ! La chambre la plus silencieuse du monde
+      (Orfield Laboratories, États-Unis) affiche <b>−24,9 dBA</b> : c'est le record du monde
+      Guinness du silence.</p>
+      <p>L'échelle des décibels est <b>logarithmique</b> : +10 dB, c'est environ 10 fois plus
+      d'énergie sonore, et à peu près 2 fois plus fort à l'oreille. Repères (mesurés à 1 m) :
+      30 dB = chuchotement · 60 dB = conversation · 90 dB = applaudissement ·
+      110 dB = cri · 120 dB = seuil de douleur.</p>
+    </div>
+  </section>
+
+  <!-- Démo pédagogique -->
+  <section id="scrDemo" class="screen hidden">
+    <h1 class="demo-title">MODE DÉMO — le décibel (dB)</h1>
+    <div class="db-readout big"><span id="demoDb">--</span><span class="db-unit">dB</span></div>
+    <div id="gaugeDemo" class="gauge-wrap"></div>
+    <p class="demo-hint">Tapez des mains, chuchotez, criez… observez !</p>
+  </section>
+
+  <footer class="footer">Plein écran : F11 · Panneau animateur : F8 · Armer : Espace ou F9 · Démo : F10 · Réinit. chrono : Ctrl+Alt+D · Retour : Échap</footer>
+</main>
+
+<!-- Panneau animateur (F8) -->
+<div id="panelAdmin" class="admin-panel hidden">
+  <h2>Panneau animateur</h2>
+
+  <div class="panel-section">
+    <h3>Calibration du micro</h3>
+    <p class="panel-help">Au choix : silence ≈ 40 dB · claquement 90 dB · calibrateur 94 dB à 1 kHz.
+      Une seule référence suffit — valeur affichée sans limite.</p>
+    <button id="calFloor" type="button">1. Silence (≈ 40 dB) — point bas</button>
+    <button id="calClap" type="button">2a. Claquement (90 dB) — point haut</button>
+    <button id="cal94" type="button">2b. Calibrateur 94 dB — point haut</button>
+    <button id="calReset" type="button">Réinitialiser la calibration</button>
+    <p id="calResult" class="panel-help"></p>
+    <p id="calStatus" class="panel-help"></p>
+  </div>
+
+  <div class="panel-section">
+    <h3>Réglages</h3>
+    <label>Seuil d'échec : <b id="thLabel">55</b> dB
+      <input id="thSlider" type="range" min="35" max="90" step="1">
+    </label>
+    <label>Seuil d'explosion : <b id="exLabel">80</b> dB
+      <input id="exSlider" type="range" min="50" max="110" step="1">
+    </label>
+    <label>Code de session (4 chiffres) :
+      <input id="codeInput" type="text" maxlength="4" inputmode="numeric">
+      <button id="codeApply" type="button">Appliquer</button>
+    </label>
+    <label>Mot à taper :
+      <input id="wordInput" type="text" maxlength="20">
+      <button id="wordApply" type="button">Appliquer</button>
+    </label>
+  </div>
+
+  <div class="panel-section">
+    <h3>Session</h3>
+    <p id="sessionInfo" class="panel-help"></p>
+    <button id="panelArm" type="button">Armer / Relancer (Espace ou F9)</button>
+    <button id="panelResetTimer" type="button">Réinitialiser le chrono (5:00)</button>
+    <button id="panelDemo" type="button">Mode démo (F10)</button>
+    <button id="panelStop" type="button">Retour repos (Échap)</button>
+    <button id="panelClose" type="button" class="btn-close">Fermer le panneau (F8)</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

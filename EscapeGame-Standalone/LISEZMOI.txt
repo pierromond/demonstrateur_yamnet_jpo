@@ -1,0 +1,39 @@
+ESCAPE GAME — 4 stations autonomes
+==================================
+
+4 dossiers independants : copiez celui (ou ceux) dont vous avez besoin
+sur l'ordinateur de la station, puis double-cliquez sur le fichier de
+lancement. Rien d'autre a configurer.
+
+  | Dossier              | Station               | Page          | Port |
+  |----------------------|-----------------------|---------------|------|
+  | 01-Mission-Silence   | Station acoustique    | /             | 3000 |
+  | 02-Spectro-Masked    | Declencheur de sons   | /             | 4000 |
+  | 03-Plaque-Chladni    | Cymatique             | /             | 4500 |
+  | 04-Cri-Du-Vivant     | Reconnaissance sonore | /             | 8765 |
+
+LANCEMENT
+  Windows : double-cliquez sur  lancer.bat  ou  lancer.sh
+  Avec Docker (RECOMMANDE pour les stations 01 et 04, aucune autre
+  installation necessaire) : lancer-docker.bat ou lancer-docker.sh
+
+PRE-REQUIS (une seule fois par PC)
+  - Docker Desktop pour les lanceurs Docker (01 et 04) :
+    https://www.docker.com/products/docker-desktop
+  - Node.js pour les stations 01, 02, 03 sans Docker :
+    https://nodejs.org (version LTS)
+  - Python 3.10-3.12 pour la station 04 sans Docker : https://python.org
+    (Windows : cochez « Add python.exe to PATH »).
+    Le lanceur Python installe tout seul ses dependances au premier
+    lancement (internet requis une fois).
+
+NOTES IMPORTANTES
+  - Micro et MIDI (stations 01, 02, 04) : utiliser Chrome ou Edge,
+    sur LE PC de la station, via http://localhost (pas une IP locale).
+  - Chaque station a son propre port : vous pouvez en lancer plusieurs
+    en meme temps sur le meme PC.
+  - Pour arreter une station : fermez sa fenetre noire (Ctrl+C).
+  - Chaque dossier contient un LISEZMOI.txt avec sa configuration
+    (config.json) et ses reglages.
+
+BON ATELIER !

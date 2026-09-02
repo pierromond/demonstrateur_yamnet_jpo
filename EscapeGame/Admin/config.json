@@ -1,0 +1,61 @@
+{
+  "port": 3100,
+  "adminPin": "445649",
+  "cloudflared": "cloudflared",
+  "adminTunnel": { "enabled": true },
+  "apps": [
+    {
+      "id": "mission-silence",
+      "name": "Mission Silence",
+      "description": "Station acoustique (Node.js)",
+      "dir": "../MissionSilence",
+      "command": "node",
+      "args": ["server.js"],
+      "port": 3000,
+      "path": "/missionSilence",
+      "adminLink": { "label": "Télécommande animateur", "path": "/admin" },
+      "autoStart": true,
+      "autoRestart": true,
+      "tunnel": false
+    },
+    {
+      "id": "cri-du-vivant",
+      "name": "Le Cri du Vivant",
+      "description": "Reconnaissance sonore YAMNet (Python/FastAPI)",
+      "dir": "../CriDuVivant/escape_game",
+      "command": "../../.venv/bin/python",
+      "args": ["server.py"],
+      "port": 8765,
+      "path": "/criVivant",
+      "autoStart": true,
+      "autoRestart": true,
+      "tunnel": false
+    },
+    {
+      "id": "spectro-masked",
+      "name": "Spectro Masked",
+      "description": "Déclencheur de sons (clavier / launchpad MIDI)",
+      "dir": "../SpectroMasked",
+      "command": "node",
+      "args": ["server.js"],
+      "port": 4000,
+      "path": "/spectroMasked",
+      "autoStart": true,
+      "autoRestart": true,
+      "tunnel": false
+    },
+    {
+      "id": "chladni",
+      "name": "Plaque de Chladni",
+      "description": "Cymatique — fréquences de résonance",
+      "dir": "../Chladni",
+      "command": "node",
+      "args": ["server.js"],
+      "port": 4500,
+      "path": "/chladni",
+      "autoStart": true,
+      "autoRestart": true,
+      "tunnel": false
+    }
+  ]
+}

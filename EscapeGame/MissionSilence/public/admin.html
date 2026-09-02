@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Télécommande — Mission Silence</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0b1020; --panel: #131a30; --ok: #2ecc71; --warn: #f1c40f;
+    --danger: #e74c3c; --text: #ecf0f1; --muted: #8fa1b3;
+  }
+  body { background: var(--bg); color: var(--text); font-family: "Segoe UI", Arial, sans-serif; padding: 16px; }
+  .hidden { display: none !important; }
+
+  #pinGate { position: fixed; inset: 0; display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; }
+  #pinGate h1 { font-size: 1.6rem; color: var(--warn); }
+  #pinInput { padding: 12px; font-size: 1.4rem; text-align: center; border-radius: 10px; border: 1px solid #2a3a55; background: #0e1526; color: var(--text); width: 160px; letter-spacing: .4em; }
+  #pinError { color: var(--danger); font-size: .9rem; }
+  button { padding: 12px 16px; border: none; border-radius: 10px; background: #2a3a55; color: var(--text); font-size: 1rem; font-weight: 700; cursor: pointer; }
+  button:hover { background: #36507a; }
+  button:disabled { opacity: .45; cursor: default; }
+
+  #app { display: flex; flex-direction: column; gap: 14px; max-width: 560px; margin: 0 auto; }
+
+  .statusbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .badge { padding: 8px 14px; border-radius: 10px; font-weight: 900; font-size: 1.1rem; letter-spacing: 1px; background: var(--panel); }
+  .badge.search { background: #1e4620; color: var(--ok); }
+  .badge.fail, .badge.explode { background: #5b1d1d; color: #ff8a8a; animation: blink 1s infinite; }
+  .badge.countdown { background: #4d3f00; color: var(--warn); }
+  .badge.success { background: #1e4620; color: var(--ok); }
+  .badge.demo { background: #4d3f00; color: var(--warn); }
+  .badge.idle { color: var(--muted); }
+  @keyframes blink { 50% { opacity: .5; } }
+
+  .card { background: var(--panel); border: 1px solid #2a3a55; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .dbrow { display: flex; align-items: baseline; gap: 8px; }
+  .dbnum { font-size: 3.2rem; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--ok); line-height: 1; }
+  .dbunit { font-size: 1.2rem; color: var(--muted); }
+  .dbmax { color: var(--muted); font-size: .95rem; }
+
+  .bar { position: relative; height: 26px; border-radius: 6px; overflow: hidden; background: #0e1526; }
+  .bar .fill { position: absolute; inset: 0; background: linear-gradient(90deg, #16a085, #2ecc71 40%, #f1c40f 75%, #e74c3c 100%); }
+  .bar .needle { position: absolute; top: 0; bottom: 0; width: 3px; background: #fff; transition: left .12s linear; }
+  .bar .th { position: absolute; top: -4px; bottom: -4px; width: 2px; background: repeating-linear-gradient(180deg, #fff 0 5px, transparent 5px 10px); }
+
+  .stats { display: flex; gap: 16px; flex-wrap: wrap; font-size: .95rem; color: var(--muted); }
+  .stats b { color: var(--text); }
+
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .row button { flex: 1; min-width: 130px; }
+  .btn-arm { background: #1d6b34; }
+  .btn-arm:hover { background: #258a43; }
+  .btn-danger { background: #6b1d1d; }
+  .btn-danger:hover { background: #8a2525; }
+  .btn-warn { background: #4d3f00; }
+  .btn-warn:hover { background: #6b5700; }
+
+  .cfgline { display: flex; align-items: center; gap: 8px; font-size: .95rem; color: var(--muted); flex-wrap: wrap; }
+  .cfgline b { color: var(--text); font-variant-numeric: tabular-nums; }
+  .cfgline input { width: 90px; padding: 6px; border-radius: 8px; border: 1px solid #2a3a55; background: #0e1526; color: var(--text); font-size: 1rem; text-align: center; }
+  .cfgline button { padding: 6px 12px; font-size: .9rem; }
+  .sep { height: 1px; background: #2a3a55; }
+  .hint { font-size: .85rem; color: var(--muted); }
+  h2 { font-size: 1.05rem; color: var(--warn); }
+</style>
+</head>
+<body>
+
+<div id="pinGate">
+  <h1>Télécommande — Mission Silence</h1>
+  <input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" autocomplete="off">
+  <button id="pinGo" type="button">Se connecter</button>
+  <p id="pinError" class="hidden">PIN incorrect.</p>
+</div>
+
+<main id="app" class="hidden">
+  <div class="statusbar">
+    <span id="stateBadge" class="badge idle">—</span>
+    <span id="connStatus" class="hint">connexion…</span>
+  </div>
+
+  <div class="card">
+    <div class="dbrow">
+      <span id="dbNum" class="dbnum">--</span>
+      <span class="dbunit">dB</span>
+      <span id="dbMax" class="dbmax">max : -- dB</span>
+    </div>
+    <div class="bar">
+      <div class="fill"></div>
+      <div id="needle" class="needle" style="left:0%"></div>
+      <div id="thMark" class="th" style="left:50%"></div>
+    </div>
+    <div class="stats">
+      <span>État : <b id="stState">—</b></span>
+      <span>Tentative : <b id="stAttempt">0</b></span>
+      <span>Pénalités : <b id="stFails">0</b></span>
+      <span>Temps : <b id="stTime">--</b></span>
+      <span>Pic : <b id="stPeak">-- dB</b></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <button id="btnArm" class="btn-arm" type="button">Armer</button>
+      <button id="btnResetTimer" class="btn-warn" type="button">Réinit. chrono</button>
+      <button id="btnDemo" class="btn-warn" type="button">Démo</button>
+      <button id="btnStop" class="btn-danger" type="button">Stop</button>
+    </div>
+    <p class="hint">L'animateur peut aussi piloter depuis le PC : F9 = armer/relancer, F10 = démo, Échap = stop.</p>
+  </div>
+
+  <div class="card">
+    <h2>Réglages de la session</h2>
+    <div class="cfgline">Seuil d'échec : <b id="cfgTh">55</b> dB
+      <button id="thMinus" type="button">-1</button>
+      <button id="thPlus" type="button">+1</button>
+    </div>
+    <div class="cfgline">Seuil d'explosion : <b id="cfgEx">80</b> dB
+      <button id="exMinus" type="button">-1</button>
+      <button id="exPlus" type="button">+1</button>
+    </div>
+    <div class="sep"></div>
+    <div class="cfgline">Code de session :
+      <input id="cfgCode" type="text" maxlength="4" inputmode="numeric">
+      <button id="codeOk" type="button">OK</button>
+    </div>
+    <div class="cfgline">Mot à taper : <b id="cfgWord">TOUCHE</b></div>
+  </div>
+</main>
+
+<script src="admin.js"></script>
+</body>
+</html>

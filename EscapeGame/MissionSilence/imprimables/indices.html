@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Indices — Mission Silence</title>
+<style>
+  @page { size: A4 portrait; margin: 10mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #111; }
+  .page-title { text-align: center; font-size: 16pt; margin-bottom: 4mm; }
+  .page-sub { text-align: center; font-size: 11pt; color: #555; margin-bottom: 6mm; }
+  .card { border: 2px dashed #888; border-radius: 5mm; padding: 6mm; margin-bottom: 6mm; page-break-inside: avoid; }
+  .card h2 { font-size: 16pt; margin-bottom: 3mm; }
+  .card p { font-size: 12pt; }
+  .frames { display: flex; gap: 8mm; align-items: center; justify-content: center; margin: 4mm 0; }
+  .frame { border: 2px solid #111; border-radius: 4mm; width: 55mm; height: 52mm; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2mm; background: #fdfdfd; }
+  .frame .cap { font-size: 10pt; color: #333; font-style: italic; }
+  .answer { text-align: center; font-size: 13pt; margin-top: 3mm; letter-spacing: 6px; font-weight: 700; }
+  .answer span { display: inline-block; width: 12mm; border-bottom: 2px solid #111; height: 8mm; }
+  .big { font-size: 22pt; font-weight: 900; text-align: center; letter-spacing: 2px; margin: 4mm 0 2mm; }
+  .center { text-align: center; }
+  .small { font-size: 10pt; color: #555; }
+</style>
+</head>
+<body>
+  <div class="page-title">MISSION SILENCE — INDICES À CACHER DANS LA SALLE</div>
+  <div class="page-sub">Imprimer, découper, cacher : sous une chaise, derrière une affiche, dans un tiroir, sous un objet…</div>
+
+  <!-- Carte 1 : le rébus -->
+  <div class="card">
+    <h2>Indice n°1 — Le rébus</h2>
+    <p>Un mot dort dans la salle. Lis les deux images pour le trouver. Ce mot réveillera l'ordinateur.</p>
+    <div class="frames">
+      <div class="frame">
+        <svg width="150" height="110" viewBox="0 0 150 110">
+          <rect x="15" y="55" width="120" height="45" rx="6" fill="#fff" stroke="#000" stroke-width="2.5"/>
+          <rect x="27" y="66" width="96" height="20" rx="4" fill="#eee" stroke="#000" stroke-width="2"/>
+          <rect x="62" y="8" width="12" height="26" fill="#000"/>
+          <ellipse cx="68" cy="44" rx="17" ry="22" fill="#f5d0a9" stroke="#000" stroke-width="2.5"/>
+        </svg>
+        <div class="cap">Un doigt sur un clavier</div>
+      </div>
+      <div class="frame">
+        <svg width="150" height="110" viewBox="0 0 150 110">
+          <rect x="10" y="30" width="130" height="60" rx="4" fill="#fff" stroke="#000" stroke-width="2.5"/>
+          <rect x="18" y="40" width="20" height="45" fill="#fff" stroke="#000" stroke-width="2"/>
+          <rect x="44" y="40" width="20" height="45" fill="#fff" stroke="#000" stroke-width="2"/>
+          <rect x="70" y="40" width="20" height="45" fill="#fff" stroke="#000" stroke-width="2"/>
+          <rect x="96" y="40" width="20" height="45" fill="#fff" stroke="#000" stroke-width="2"/>
+          <rect x="36" y="34" width="12" height="26" fill="#000"/>
+          <rect x="88" y="34" width="12" height="26" fill="#000"/>
+        </svg>
+        <div class="cap">Des touches de piano</div>
+      </div>
+    </div>
+    <div class="center small">Chaque image se lit « touche » : l'une au clavier, l'autre au piano. Le mot :</div>
+    <div class="answer"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- Carte 2 : taper le mot -->
+  <div class="card">
+    <h2>Indice n°2 — Le réveil de l'ordinateur</h2>
+    <p>Sur l'ordinateur dort un système verrouillé. Tape le mot trouvé sur le clavier… il s'éveillera et révélera le code.</p>
+    <div class="center small">Mais attention : pas un bruit pendant tout ce temps !</div>
+  </div>
+
+  <!-- Carte 3 : le bruit efface le code -->
+  <div class="card">
+    <h2>Indice n°3 — Avertissement</h2>
+    <div class="big">LE BRUIT EFFACE LE CODE</div>
+    <p class="center">Le système détecte le moindre bruit. Trop de bruit, et le code disparaîtra pour toujours !</p>
+  </div>
+
+  <!-- Carte 4 : le silence est d'or -->
+  <div class="card">
+    <h2>Indice n°4 — Message caché</h2>
+    <div class="big">LE SILENCE EST D'OR</div>
+    <p class="center">Chuchotez, marchez sur la pointe des pieds, communiquez par gestes…</p>
+  </div>
+</body>
+</html>

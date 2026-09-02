@@ -1,0 +1,15 @@
+{
+  "word": "SILENCE",
+  "code": "4821",
+  "thresholdDb": 55,
+  "explodeThresholdDb": 65,
+  "failDurationMs": 1000,
+  "codeDisplayMs": 120000,
+  "timeoutDisplayMs": 30000,
+  "timeLimitMs": 300000,
+  "timePenaltyMs": 20000,
+  "wordPenaltyMs": 10000,
+  "maxFails": 0,
+  "adminPin": "445649",
+  "port": 3000
+}

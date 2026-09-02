@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plaque de Chladni — Cymatique</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    background: #0b1020;
+    color: #a0d0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem;
+  }
+
+  h1 {
+    font-size: 3rem;
+    letter-spacing: 0.12em;
+    color: #60c0ff;
+    text-shadow: 0 0 40px rgba(96, 192, 255, 0.5);
+    margin-bottom: 0.4rem;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 1.3rem;
+    color: #608090;
+    margin-bottom: 1.2rem;
+    text-align: center;
+  }
+
+  .freq-display {
+    font-size: clamp(4rem, 14vw, 9rem);
+    font-weight: 900;
+    color: #c0e8ff;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 30px rgba(96, 192, 255, 0.45);
+    line-height: 1.1;
+    margin-bottom: 0.2rem;
+  }
+
+  .freq-unit { font-size: 0.4em; color: #608090; margin-left: 0.2em; }
+
+  .wave-wrap { position: relative; width: min(680px, 94vw); margin: 0.6rem auto 0.3rem; }
+
+  .wave-wrap canvas { width: 100%; height: auto; display: block; }
+
+  .wave-axis {
+    position: relative;
+    width: 100%;
+    height: 2.1rem;
+  }
+
+  .wave-axis .tick {
+    position: absolute;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .wave-axis .tick::before {
+    content: '';
+    width: 2px;
+    height: 7px;
+    background: #2a4a6a;
+    border-radius: 1px;
+  }
+
+  .wave-axis .tick span {
+    font-size: 1.05rem;
+    color: #7fa8c0;
+    font-weight: bold;
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+
+  .wave-caption {
+    font-size: 1.6rem;
+    color: #a0c8e0;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  .wave-length {
+    font-size: 1.35rem;
+    color: #60c0ff;
+    text-align: center;
+    font-weight: bold;
+    min-height: 2rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .ref-zone {
+    width: min(920px, 96vw);
+    margin: 0 auto 1rem;
+  }
+
+  .ref-ruler {
+    position: relative;
+    height: 1.3rem;
+    border-bottom: 2px solid #24466a;
+    margin-bottom: 1rem;
+  }
+
+  .ref-dot {
+    position: absolute;
+    top: 100%;
+    transform: translate(-50%, -50%);
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #2a5a8a;
+    border: 2px solid #0b1020;
+  }
+
+  .ref-cursor {
+    position: absolute;
+    top: -6px;
+    bottom: -4px;
+    width: 3px;
+    background: #60c0ff;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(96, 192, 255, 0.9);
+    transition: left 0.1s linear;
+    z-index: 2;
+  }
+
+  .ref-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.7rem;
+  }
+
+  .ref-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #131a30;
+    border: 2px solid #2a3a55;
+    border-radius: 999px;
+    font-size: 1.05rem;
+    color: #8fa1b3;
+    transition: all 0.25s ease;
+  }
+
+  .ref-chip .chip-emoji { font-size: 1.7rem; line-height: 1; }
+
+  .ref-chip .chip-freq { font-size: 0.8rem; color: #5a7a99; }
+
+  .ref-chip.active {
+    border-color: #d4a020;
+    background: #2a2408;
+    color: #ffe080;
+    box-shadow: 0 0 18px rgba(212, 160, 32, 0.45);
+    transform: scale(1.06);
+  }
+
+  .ref-chip.active .chip-freq { color: #d4a020; }
+
+  .ref-current {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #d0ecff;
+    font-weight: bold;
+    min-height: 2.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin: 1rem 0 1.4rem;
+  }
+
+  .step-btn {
+    width: clamp(5rem, 18vw, 8rem);
+    height: clamp(5rem, 18vw, 8rem);
+    border: none;
+    border-radius: 50%;
+    font-size: clamp(3rem, 9vw, 5rem);
+    font-weight: 900;
+    cursor: pointer;
+    user-select: none;
+    background: #2a3a55;
+    color: #c0e8ff;
+    transition: transform 0.08s ease, background 0.2s ease;
+    box-shadow: 0 6px 0 #101a2e;
+  }
+
+  .step-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #101a2e; }
+  .step-btn:hover { background: #36507a; }
+
+  .sound-btn {
+    padding: 0.9rem 1.6rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.3rem;
+    font-weight: 900;
+    cursor: pointer;
+    background: #1d6b34;
+    color: #fff;
+  }
+
+  .sound-btn.playing { background: #6b1d1d; }
+
+  .volume-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: #608090;
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  input[type=range] { width: 200px; }
+
+  .hint {
+    margin-top: 1.2rem;
+    font-size: 1.15rem;
+    color: #6090b0;
+    text-align: center;
+    max-width: 680px;
+    line-height: 1.6;
+  }
+
+  .admin-hint {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    font-size: 0.7rem;
+    color: #304050;
+    opacity: 0.7;
+  }
+
+  .mic-status {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1rem;
+    color: #406070;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="mic-status" id="soundStatus">🔇 Son coupé</div>
+
+<h1>🌊 Plaque de Chladni</h1>
+<p class="subtitle">Faites vibrer la plaque et observez les motifs que dessine le sable !</p>
+
+<div class="freq-display"><span id="freqValue">438</span><span class="freq-unit">Hz</span></div>
+
+<div class="wave-wrap">
+  <canvas id="waveCanvas" width="680" height="90"></canvas>
+  <div class="wave-axis" id="waveAxis"></div>
+</div>
+<p class="wave-caption">La fréquence, c'est le nombre de vibrations par seconde.<br>
+Chaque vague est une vibration qui avance — sa longueur, c'est la <b>longueur d'onde</b> :
+plus la fréquence monte, plus les vagues se rapprochent !</p>
+<p class="wave-length" id="waveLengthInfo"></p>
+
+<div class="ref-zone">
+  <div class="ref-ruler" id="refRuler">
+    <div class="ref-cursor" id="refCursor"></div>
+  </div>
+  <div class="ref-chips" id="refChips"></div>
+</div>
+
+<div class="controls">
+  <button id="btnMinus" class="step-btn" type="button" aria-label="Diminuer la fréquence">−</button>
+  <button id="btnSound" class="sound-btn" type="button">▶ Sonner</button>
+  <button id="btnPlus" class="step-btn" type="button" aria-label="Augmenter la fréquence">+</button>
+</div>
+
+<div class="volume-row">
+  <span>Volume</span>
+  <input id="volume" type="range" min="0" max="100" value="35">
+</div>
+
+<p class="hint">Appuyez sur <b>+</b> ou <b>−</b> (ou les flèches ← → du clavier) pour parcourir les fréquences.
+Le balayage ne s'arrête que sur les fréquences de résonance de la plaque : 10 fréquences,
+de 50 Hz à 405 Hz.</p>
+
+<div class="admin-hint">Fréquences de résonance (10) : config.json</div>
+
+<script>
+let config = null;
+let pos = 0;
+let posMin = 0;
+let posMax = 0;
+
+let audioCtx = null;
+let osc = null;
+let gainNode = null;
+let playing = false;
+let repeatTimer = null;
+
+const freqValue = document.getElementById('freqValue');
+const btnSound = document.getElementById('btnSound');
+const soundStatus = document.getElementById('soundStatus');
+const volume = document.getElementById('volume');
+const waveCanvas = document.getElementById('waveCanvas');
+const waveCtx = waveCanvas.getContext('2d');
+const waveAxis = document.getElementById('waveAxis');
+const refRuler = document.getElementById('refRuler');
+const refCursor = document.getElementById('refCursor');
+const refChips = document.getElementById('refChips');
+const waveLengthInfo = document.getElementById('waveLengthInfo');
+let wavePhase = 0;
+const SPEED_OF_SOUND = 343;
+const WAVE_DISTANCE_M = 3.43;
+
+function freqAt(p) {
+  return config.frequencies[p];
+}
+
+function pctOf(f) {
+  const lo = config.frequencies[0];
+  const hi = config.frequencies[config.frequencies.length - 1];
+  return ((f - lo) / (hi - lo)) * 100;
+}
+
+function currentFreq() {
+  return freqAt(pos);
+}
+
+function buildAxis() {
+  waveAxis.innerHTML = '';
+  const n = Math.ceil(WAVE_DISTANCE_M);
+  for (let d = 0; d <= n; d++) {
+    const tick = document.createElement('div');
+    tick.className = 'tick';
+    tick.style.left = (d / WAVE_DISTANCE_M) * 100 + '%';
+    tick.innerHTML = '<span>' + d + ' m</span>';
+    waveAxis.append(tick);
+  }
+}
+
+function buildRefs() {
+  refRuler.innerHTML = '';
+  refChips.innerHTML = '';
+  refRuler.append(refCursor);
+  for (const r of config.references) {
+    const dot = document.createElement('div');
+    dot.className = 'ref-dot';
+    dot.style.left = pctOf(r.frequency) + '%';
+    refRuler.append(dot);
+
+    const chip = document.createElement('div');
+    chip.className = 'ref-chip';
+    chip.innerHTML = '<span class="chip-emoji">' + r.emoji + '</span>' +
+      '<span class="chip-label">' + r.label + '</span>' +
+      '<span class="chip-freq">' + Math.round(r.frequency) + ' Hz</span>';
+    refChips.append(chip);
+  }
+}
+
+function nearestRefIndex(f) {
+  let best = 0;
+  let bestDist = Infinity;
+  for (let i = 0; i < config.references.length; i++) {
+    const d = Math.abs(Math.log2(f / config.references[i].frequency));
+    if (d < bestDist) {
+      bestDist = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
+function updateRefCurrent() {
+  const f = currentFreq();
+  refCursor.style.left = pctOf(f) + '%';
+  const idx = nearestRefIndex(f);
+  for (let i = 0; i < refChips.children.length; i++) {
+    refChips.children[i].classList.toggle('active', i === idx);
+  }
+  const lambda = SPEED_OF_SOUND / f;
+  const fmt = lambda >= 1 ? lambda.toFixed(1) + ' m' : Math.round(lambda * 100) + ' cm';
+  waveLengthInfo.textContent = '1 vibration parcourt ' + fmt + ' — c\u2019est la longueur d\u2019onde (343 m/s ÷ ' + Math.round(f) + ' Hz)';
+}
+
+function drawWave() {
+  const w = waveCanvas.width;
+  const h = waveCanvas.height;
+  const f = currentFreq();
+  const wavelength = SPEED_OF_SOUND / f;
+  const periods = Math.min(24, (WAVE_DISTANCE_M / wavelength));
+  waveCtx.clearRect(0, 0, w, h);
+
+  waveCtx.strokeStyle = 'rgba(42, 74, 106, 0.6)';
+  waveCtx.lineWidth = 1;
+  for (let d = 1; d < WAVE_DISTANCE_M; d++) {
+    const x = (d / WAVE_DISTANCE_M) * w;
+    waveCtx.beginPath();
+    waveCtx.moveTo(x, 4);
+    waveCtx.lineTo(x, h - 4);
+    waveCtx.stroke();
+  }
+
+  waveCtx.beginPath();
+  for (let x = 0; x <= w; x++) {
+    const y = h / 2 + Math.sin((x / w) * 2 * Math.PI * periods + wavePhase) * (h / 2 - 10);
+    if (x === 0) waveCtx.moveTo(x, y);
+    else waveCtx.lineTo(x, y);
+  }
+  waveCtx.strokeStyle = '#60c0ff';
+  waveCtx.lineWidth = 3;
+  waveCtx.shadowColor = 'rgba(96, 192, 255, 0.7)';
+  waveCtx.shadowBlur = 12;
+  waveCtx.stroke();
+  waveCtx.shadowBlur = 0;
+  wavePhase += f * 0.003;
+  requestAnimationFrame(drawWave);
+}
+
+function applyFreq() {
+  freqValue.textContent = String(Math.round(currentFreq()));
+  updateRefCurrent();
+  if (osc && playing) {
+    osc.frequency.setTargetAtTime(currentFreq(), audioCtx.currentTime, 0.03);
+  }
+}
+
+function step(delta) {
+  const np = Math.min(posMax, Math.max(posMin, pos + delta));
+  if (np === pos) return;
+  pos = np;
+  applyFreq();
+}
+
+function startSound() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    gainNode = audioCtx.createGain();
+    gainNode.gain.value = volume.value / 100;
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    osc.frequency.value = currentFreq();
+    osc.start();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  playing = true;
+  gainNode.gain.value = volume.value / 100;
+  btnSound.textContent = '■ Couper le son';
+  btnSound.classList.add('playing');
+  soundStatus.textContent = '🔊 Sinus à ' + Math.round(currentFreq()) + ' Hz';
+}
+
+function stopSound() {
+  playing = false;
+  if (gainNode) gainNode.gain.value = 0;
+  btnSound.textContent = '▶ Sonner';
+  btnSound.classList.remove('playing');
+  soundStatus.textContent = '🔇 Son coupé';
+}
+
+btnSound.addEventListener('click', () => {
+  if (playing) stopSound();
+  else startSound();
+});
+
+volume.addEventListener('input', () => {
+  if (gainNode && playing) gainNode.gain.value = volume.value / 100;
+});
+
+function startRepeat(delta) {
+  step(delta);
+  clearInterval(repeatTimer);
+  repeatTimer = setInterval(() => step(delta), 110);
+}
+function stopRepeat() {
+  clearInterval(repeatTimer);
+}
+
+for (const [id, delta] of [["btnPlus", 1], ["btnMinus", -1]]) {
+  const btn = document.getElementById(id);
+  btn.addEventListener('mousedown', (e) => { e.preventDefault(); startRepeat(delta); });
+  btn.addEventListener('touchstart', (e) => { e.preventDefault(); startRepeat(delta); }, { passive: false });
+  btn.addEventListener('mouseup', stopRepeat);
+  btn.addEventListener('mouseleave', stopRepeat);
+  btn.addEventListener('touchend', stopRepeat);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') { step(1); }
+  else if (e.key === 'ArrowLeft') { step(-1); }
+  else return;
+  e.preventDefault();
+});
+
+async function init() {
+  const resp = await fetch('config');
+  config = await resp.json();
+  posMin = 0;
+  posMax = config.frequencies.length - 1;
+  buildAxis();
+  buildRefs();
+  pos = posMin;
+  applyFreq();
+  drawWave();
+}
+
+init();
+</script>
+</body>
+</html>
