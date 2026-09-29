@@ -10,7 +10,7 @@ indépendante (elle peut tourner seule sur un PC), ou pilotée depuis une interf
 | `MissionSilence/` | Station acoustique | Sonomètre — rester silencieux, trouver le mot, obtenir le code (Node.js) | 3000 |
 | `CriDuVivant/` | Reconnaissance sonore | Imiter les cris d'animaux, analysés par YAMNet (Python/FastAPI + TensorFlow) | 8765 |
 | `SpectroMasked/` | Déclencheur de sons | Sons déclenchés au clavier ou au Launchpad MK2 (Node.js) | 4000 |
-| `PlaqueChladni/` | Cymatique | Fréquences de résonance de la plaque (Node.js) | 4500 |
+| `Chladni/` | Cymatique | Fréquences de résonance de la plaque (Node.js) | 4500 |
 
 ## Démarrage rapide (développement)
 
@@ -41,7 +41,7 @@ salle et taper le code pour arrêter le chrono.
   pédagogique sur le **décibel** (0 dB n'est pas le silence absolu, record −24,9 dBA…).
 
 ### Le Cri du Vivant (8765) — reconnaissance sonore YAMNet
-Les enfants doivent **imiter les cris d'animaux** : cochon, chien, mouton, loup
+Les enfants doivent **imiter les cris d'animaux** : chien, cochon, mouton, loup
 (difficulté progressive : seuils et aides par énigme dans `config.json`).
 - Analyse par **YAMNet** (réseau de neurones Google, 521 classes de sons, AudioSet) ;
 - Détection de la voix humaine → message d'énigme ;

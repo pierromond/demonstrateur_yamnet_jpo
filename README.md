@@ -38,7 +38,7 @@ EscapeGame/
   MissionSilence/   Station 1 — acoustique (Node.js)
   CriDuVivant/      Station 2 — YAMNet (Python)
   SpectroMasked/    Station 3 — sons / Launchpad (Node.js)
-  PlaqueChladni/    Station 4 — cymatique (Node.js)
+  Chladni/          Station 4 — cymatique (Node.js)
   README.md         Documentation complète
 EscapeGame-Standalone/   Dossiers autonomes prêts à copier (ZIP inclus)
 docker-compose.yml       Déploiement serveur (4 stations, option HTTPS)
