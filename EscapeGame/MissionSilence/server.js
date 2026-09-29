@@ -14,11 +14,35 @@ function loadConfig() {
 let config = loadConfig();
 const PORT = config.port || 3000;
 
+const CALIB_PATH = path.join(ROOT, "calibration.json");
+
+function loadCalibration() {
+  try {
+    const c = JSON.parse(fs.readFileSync(CALIB_PATH, "utf8"));
+    if (c && Number.isFinite(c.offsetDb)) {
+      return {
+        offsetDb: c.offsetDb,
+        method: typeof c.method === "string" ? c.method : null,
+        referenceDb: Number.isFinite(c.referenceDb) ? c.referenceDb : null,
+        calibratedAt: typeof c.calibratedAt === "string" ? c.calibratedAt : null
+      };
+    }
+  } catch (err) { /* pas encore calibré */ }
+  return { offsetDb: null, method: null, referenceDb: null, calibratedAt: null };
+}
+
+function saveCalibration() {
+  fs.writeFileSync(CALIB_PATH, JSON.stringify(calibration, null, 2) + "\n");
+}
+
+let calibration = loadCalibration();
+
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
-  ".json": "application/json; charset=utf-8"
+  ".json": "application/json; charset=utf-8",
+  ".wav": "audio/wav"
 };
 
 const clients = new Set();
@@ -48,10 +72,13 @@ function publicConfig() {
     explodeThresholdDb: config.explodeThresholdDb,
     failDurationMs: config.failDurationMs,
     codeDisplayMs: config.codeDisplayMs,
+    timeoutDisplayMs: config.timeoutDisplayMs,
     timeLimitMs: config.timeLimitMs,
     timePenaltyMs: config.timePenaltyMs,
     wordPenaltyMs: config.wordPenaltyMs,
-    maxFails: config.maxFails
+    maxFails: config.maxFails,
+    calibration: calibration,
+    calibrationSettings: config.calibration || null
   };
 }
 
@@ -127,6 +154,10 @@ async function handle(req, res) {
   try {
     pathname = decodeURIComponent(url.pathname);
   } catch (err) {
+    sendJson(res, 400, { ok: false, error: "bad path" });
+    return;
+  }
+  if (/[\u0000-\u001f\u007f]/.test(pathname)) {
     sendJson(res, 400, { ok: false, error: "bad path" });
     return;
   }
@@ -240,6 +271,30 @@ async function handle(req, res) {
           broadcast("cmd", { action: "word", value: config.word });
           break;
         }
+        case "calibration": {
+          const v = body.value || {};
+          const methods = ["ambient", "clap", "reference94"];
+          const offset = Number(v.offsetDb);
+          if (!Number.isFinite(offset) || !methods.includes(v.method)) {
+            sendJson(res, 400, { ok: false, error: "calibration invalide" });
+            return;
+          }
+          calibration = {
+            offsetDb: Math.min(Math.max(offset, -20), 160),
+            method: v.method,
+            referenceDb: Number.isFinite(Number(v.referenceDb)) ? Number(v.referenceDb) : null,
+            calibratedAt: new Date().toISOString()
+          };
+          saveCalibration();
+          broadcast("cmd", { action: "calibration", value: calibration });
+          break;
+        }
+        case "calibrationReset": {
+          calibration = { offsetDb: null, method: null, referenceDb: null, calibratedAt: null };
+          saveCalibration();
+          broadcast("cmd", { action: "calibration", value: calibration });
+          break;
+        }
         default:
           sendJson(res, 400, { ok: false, error: "unknown action" });
           return;
@@ -265,7 +320,9 @@ async function handle(req, res) {
     filePath = path.join(baseDir, "admin.html");
   } else if (pathname.startsWith("/imprimables/")) {
     baseDir = path.join(ROOT, "imprimables");
-    filePath = safeJoin(baseDir, pathname.slice("/imprimables/".length));
+    let rel = pathname.slice("/imprimables/".length);
+    if (rel === "" || rel.endsWith("/")) rel += "index.html";
+    filePath = safeJoin(baseDir, rel);
   } else {
     baseDir = path.join(ROOT, "public");
     filePath = safeJoin(baseDir, pathname);

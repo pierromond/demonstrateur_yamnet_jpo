@@ -44,6 +44,7 @@
   .bar .fill { position: absolute; inset: 0; background: linear-gradient(90deg, #16a085, #2ecc71 40%, #f1c40f 75%, #e74c3c 100%); }
   .bar .needle { position: absolute; top: 0; bottom: 0; width: 3px; background: #fff; transition: left .12s linear; }
   .bar .th { position: absolute; top: -4px; bottom: -4px; width: 2px; background: repeating-linear-gradient(180deg, #fff 0 5px, transparent 5px 10px); }
+  .bar .th.expl { background: repeating-linear-gradient(180deg, #ff3b3b 0 5px, transparent 5px 10px); }
 
   .stats { display: flex; gap: 16px; flex-wrap: wrap; font-size: .95rem; color: var(--muted); }
   .stats b { color: var(--text); }
@@ -91,6 +92,7 @@
       <div class="fill"></div>
       <div id="needle" class="needle" style="left:0%"></div>
       <div id="thMark" class="th" style="left:50%"></div>
+      <div id="exMark" class="th expl" style="left:60%"></div>
     </div>
     <div class="stats">
       <span>État : <b id="stState">—</b></span>
@@ -117,16 +119,17 @@
       <button id="thMinus" type="button">-1</button>
       <button id="thPlus" type="button">+1</button>
     </div>
-    <div class="cfgline">Seuil d'explosion : <b id="cfgEx">80</b> dB
+    <div class="cfgline">Seuil d'explosion : <b id="cfgEx">--</b> dB
       <button id="exMinus" type="button">-1</button>
       <button id="exPlus" type="button">+1</button>
     </div>
     <div class="sep"></div>
+    <div class="cfgline">Calibration : <b id="cfgCalib">—</b></div>
     <div class="cfgline">Code de session :
       <input id="cfgCode" type="text" maxlength="4" inputmode="numeric">
       <button id="codeOk" type="button">OK</button>
     </div>
-    <div class="cfgline">Mot à taper : <b id="cfgWord">TOUCHE</b></div>
+    <div class="cfgline">Mot à taper : <b id="cfgWord">—</b></div>
   </div>
 </main>
 

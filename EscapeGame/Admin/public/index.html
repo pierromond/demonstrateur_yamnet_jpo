@@ -179,9 +179,11 @@ async function api(path, method, body) {
   return data;
 }
 
-async function doAction(path, withPin) {
+async function doAction(path, withPin, extra) {
   try {
-    await api(path, "POST", withPin ? { pin } : {});
+    const payload = Object.assign({}, extra || {});
+    if (withPin) payload.pin = pin;
+    await api(path, "POST", payload);
     if (withPin) sessionStorage.setItem(PIN_KEY, pin);
   } catch (err) {
     if (withPin && err.message.includes("pin")) {
@@ -258,7 +260,7 @@ document.addEventListener("click", async (e) => {
 document.addEventListener("change", async (e) => {
   const cb = e.target.closest("input[data-act=autorestart]");
   if (!cb) return;
-  await doAction("/api/app/" + cb.dataset.id + "/autorestart", true);
+  await doAction("/api/app/" + cb.dataset.id + "/autorestart", true, { value: cb.checked });
 });
 
 $("btnAllStart").addEventListener("click", async () => {

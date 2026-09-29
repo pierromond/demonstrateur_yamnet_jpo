@@ -20,6 +20,8 @@
 
 <main id="app" class="hidden">
 
+  <div id="calBanner" class="cal-banner">Calibration micro non faite — appuyez sur F8 pour calibrer</div>
+
   <!-- État repos -->
   <section id="scrIdle" class="screen">
     <div class="idle-lock" aria-hidden="true">
@@ -47,11 +49,11 @@
     <div class="search-top">
       <div class="search-timer">
         <div id="searchTimer">5:00</div>
-        <div class="timer-label">restantes</div>
         <span id="timePenalty" class="time-penalty hidden">-10 s</span>
       </div>
       <div class="search-attempt">Tentative n°<span id="attemptNum">1</span></div>
     </div>
+    <p class="search-deadline">Il reste <b id="deadlineTime">5:00</b> avant que le code ne disparaisse, reste silencieux !</p>
     <div class="db-readout big"><span id="searchDb">--</span><span class="db-unit">dB</span></div>
     <div id="gaugeSearch" class="gauge-wrap"></div>
     <div id="noiseWarning" class="noise-warning hidden">ATTENTION… CHUUUT !</div>
@@ -121,22 +123,23 @@
 
   <div class="panel-section">
     <h3>Calibration du micro</h3>
-    <p class="panel-help">Au choix : silence ≈ 40 dB · claquement 90 dB · calibrateur 94 dB à 1 kHz.
-      Une seule référence suffit — valeur affichée sans limite.</p>
-    <button id="calFloor" type="button">1. Silence (≈ 40 dB) — point bas</button>
-    <button id="calClap" type="button">2a. Claquement (90 dB) — point haut</button>
-    <button id="cal94" type="button">2b. Calibrateur 94 dB — point haut</button>
+    <p class="panel-help">Choisissez UNE référence (le résultat est enregistré sur le serveur et réutilisé
+      aux prochains lancements) :</p>
+    <button id="calAmbient" type="button">Bruit de fond (30 dB)</button>
+    <button id="calClap" type="button">Claquement (90 dB)</button>
+    <button id="calReference" type="button">Source étalon (94 dB)</button>
     <button id="calReset" type="button">Réinitialiser la calibration</button>
+    <p id="calLive" class="panel-help hidden">Mesure : <b id="calLiveDb">--</b> dB</p>
     <p id="calResult" class="panel-help"></p>
     <p id="calStatus" class="panel-help"></p>
   </div>
 
   <div class="panel-section">
     <h3>Réglages</h3>
-    <label>Seuil d'échec : <b id="thLabel">55</b> dB
+    <label>Seuil d'échec : <b id="thLabel">--</b> dB
       <input id="thSlider" type="range" min="35" max="90" step="1">
     </label>
-    <label>Seuil d'explosion : <b id="exLabel">80</b> dB
+    <label>Seuil d'explosion : <b id="exLabel">--</b> dB
       <input id="exSlider" type="range" min="50" max="110" step="1">
     </label>
     <label>Code de session (4 chiffres) :

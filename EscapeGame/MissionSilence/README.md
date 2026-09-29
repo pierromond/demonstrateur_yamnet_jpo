@@ -1,8 +1,9 @@
 # Mission Silence — Station acoustique (escape game)
 
 Station d'un escape game pour enfants : retrouver en silence un mot caché dans la salle, le taper
-sur l'ordinateur, et noter le code 4 chiffres affiché. Tout bruit trop fort fait échouer la mission ;
-un cri très fort fait « exploser » l'écran (effet visuel de brouillage).
+sur l'ordinateur, et noter le code 4 chiffres affiché. Un bruit trop fort déclenche un avertissement
+« CHUUUT ! » (sans pénalité) ; un cri très fort fait « exploser » l'écran (brouillage visuel et
+alarme sonore) et coûte 20 s de chrono.
 
 ## Démarrage
 
@@ -15,7 +16,7 @@ node server.js
 
 - Écran de jeu (sur le PC) : `http://localhost:3000` — cliquer pour activer le micro, plein écran (F11).
   Le micro n'est autorisé qu'en `localhost` (contexte sécurisé du navigateur).
-- Télécommande (téléphone de l'animateur, même WiFi) : `http://<IP-du-PC>:3000/admin` — PIN par défaut `1234`.
+- Télécommande (téléphone de l'animateur, même WiFi) : `http://<IP-du-PC>:3000/admin` — PIN par défaut `445649`.
   Le serveur affiche l'IP du PC au démarrage.
 - Imprimables : `http://localhost:3000/imprimables/` (Affiche dB, indices, fiches code, briefing porte,
   notice animateur).
@@ -54,17 +55,19 @@ l'animateur. Sur cette URL :
 
 | Champ | Défaut | Rôle |
 |---|---|---|
-| `word` | `TOUCHE` | Mot à taper pour révéler le code |
+| `word` | `SILENCE` | Mot à taper pour révéler le code |
 | `code` | `4821` | Code 4 chiffres affiché au succès |
-| `thresholdDb` | `55` | Seuil d'échec (dépassé ~1 s → échec) |
-| `explodeThresholdDb` | `80` | Seuil d'explosion (brouillage spectaculaire) |
-| `failDurationMs` | `1000` | Durée de dépassement avant échec |
-| `codeDisplayMs` | `30000` | Durée d'affichage du code |
-| `timeLimitMs` | `300000` | Chrono de la mission (5 min) — réinitialisable par l'admin uniquement |
+| `thresholdDb` | `55` | Seuil d'alerte (message « CHUUUT ! », aucune pénalité) |
+| `explodeThresholdDb` | `65` | Seuil d'explosion (alarme + brouillage + pénalité) |
+| `failDurationMs` | `1000` | Non utilisé (hérité, sans effet) |
+| `codeDisplayMs` | `120000` | Durée d'affichage du code (2 min) |
+| `timeoutDisplayMs` | `30000` | Durée d'affichage des 3 chiffres au temps écoulé (30 s) |
+| `timeLimitMs` | `300000` | Chrono de la mission (5 min) — réinitialisé à chaque armement, ou par l'admin |
 | `timePenaltyMs` | `20000` | Pénalité du cri (seuil d'explosion) |
 | `wordPenaltyMs` | `10000` | Pénalité d'un mot faux |
-| `adminPin` | `1234` | PIN de la télécommande |
+| `adminPin` | `445649` | PIN de la télécommande |
 | `port` | `3000` | Port HTTP |
+| `calibration` | voir fichier | Ancres des 3 références, durées de mesure et tolérances |
 
 ## Contrôles
 
@@ -75,8 +78,26 @@ l'animateur. Sur cette URL :
 
 ## Calibration
 
-F8 → « Mesurer le silence (3 s) » puis « Tapez des mains près du micro » (repère : claquement = 90 dB).
-Le réglage est conservé par le navigateur. Ajustez ensuite le seuil d'échec (55 dB par défaut).
+La calibration est **facultative** : tant qu'elle n'est pas faite, un bandeau rouge « Calibration micro
+non faite » s'affiche et les valeurs en dB sont indicatives.
+
+Au démarrage, dans **F8 → Calibration du micro**, l'animateur choisit **une seule** référence :
+
+| Référence | Mesure | Défaut |
+|---|---|---|
+| **Bruit de fond** | niveau ambiant médian pendant 3 s (au calme) | ancre **30 dB** |
+| **Claquement** | pic d'un claquement de mains (doit dépasser le bruit de fond de ≥ 20 dB) | ancre **90 dB** |
+| **Source étalon** | moyenne d'un calibrateur 1 kHz (signal stable) | ancre **94 dB** |
+
+La mesure affiche le niveau en direct ; si la mesure est incohérente (claquement non détecté, ambiance
+ou signal instable), elle est refusée. Une fois validée, l'offset est **enregistré sur le serveur**
+(dans `calibration.json`, non versionné) et réappliqué automatiquement à chaque lancement. Il reste en
+vigueur jusqu'à une nouvelle calibration (« Réinitialiser la calibration » efface l'enregistrement).
+
+- Les 3 références sont **exclusives** : la dernière validée remplace la précédente.
+- Le réglage est **local à la machine** (micro du PC de la station) ; le fichier `calibration.json`
+  n'est pas suivi par Git et doit être refait si l'on change de PC/micro.
+- Ajustez ensuite le seuil d'alerte (55 dB par défaut) si besoin.
 
 ## Règles du jeu
 
@@ -84,14 +105,16 @@ Le réglage est conservé par le navigateur. Ajustez ensuite le seuil d'échec (
    grand : c'est le temps pour trouver le code avant qu'il ne s'efface.
 2. **Bruit ≥ seuil** (ex. 55 dB) → un message « ATTENTION… CHUUUT ! » s'affiche tant que le bruit
    persiste (le jeu continue, **aucune pénalité**).
-3. **Cri ≥ seuil d'explosion** (ex. 80 dB) → l'écran se brouille, tremble, « explose » (avec un
-   « **-20 s sur le compteur !** » bien visible), puis la mission reprend avec **-20 s**.
-   La pénalité de temps s'applique au **seuil d'explosion uniquement**.
+3. **Cri ≥ seuil d'explosion** (ex. 65 dB) → une **alarme sonore** retentit, l'écran se brouille,
+   tremble, « explose » (avec un « **-20 s sur le compteur !** » bien visible), puis la mission
+   reprend avec **-20 s**. La pénalité de temps s'applique au **seuil d'explosion uniquement**.
 4. **Mot faux** (mot complet tapé, incorrect) → **-10 s** et le champ s'efface pour réessayer.
-5. Taper le mot exact (ex. `IMPERCEPTIBLE`) → le code s'affiche 30 s : les enfants le notent.
+5. Taper le mot exact (ex. `SILENCE`) → le code s'affiche 2 min : les enfants le notent.
 6. **Chrono à 0** → écran « Désolé, vous n'aurez que 3 chiffres sur 4 » : seuls les 3 premiers
    chiffres du code sont révélés (30 s), puis retour au repos.
-7. Seul l'animateur peut **réinitialiser le chrono** : bouton « Réinitialiser le chrono » sur la
-   télécommande (`/admin`) ou dans le panneau animateur (F8).
+7. Le chrono est **réinitialisé à chaque armement** (Espace/F9 ou télécommande) ; l'animateur peut
+   aussi le réinitialiser en cours de mission via « Réinitialiser le chrono » (`/admin` ou F8).
 
-L'application ne produit **aucun son** : tous les retours sont visuels.
+Le seul son produit est l'**alarme d'explosion**
+(`public/570462__fusionwolf3740__delta-7-detonation-alarm.wav`), jouée au franchissement du seuil
+d'explosion. Tous les autres retours sont visuels.

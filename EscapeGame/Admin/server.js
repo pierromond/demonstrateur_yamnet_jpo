@@ -422,26 +422,26 @@ function safeJoin(base, rel) {
 async function requirePin(req, res, ip) {
   if (pinLocked(ip)) {
     sendJson(res, 429, { ok: false, error: "trop de tentatives, réessayez dans une minute" });
-    return false;
+    return null;
   }
   if (!isJsonPost(req) || !originAllowed(req)) {
     sendJson(res, 415, { ok: false, error: "content-type ou origine invalide" });
-    return false;
+    return null;
   }
   let body;
   try {
     body = JSON.parse(await readBody(req) || "{}");
   } catch (err) {
     sendJson(res, 400, { ok: false, error: "bad body" });
-    return false;
+    return null;
   }
   if (body.pin !== ADMIN_PIN) {
     pinFail(ip);
     sendJson(res, 403, { ok: false, error: "pin incorrect" });
-    return false;
+    return null;
   }
   pinSuccess(ip);
-  return true;
+  return body;
 }
 
 function proxyRequest(req, res, targetPort, prefix) {
@@ -542,7 +542,8 @@ async function handle(req, res) {
 
   const appMatch = pathname.match(/^\/api\/app\/([^/]+)\/([^/]+)$/);
   if (appMatch) {
-    if (!(await requirePin(req, res, ip))) return;
+    const pinBody = await requirePin(req, res, ip);
+    if (!pinBody) return;
     const [, id, action] = appMatch;
     const a = apps.get(id);
     if (!a) {
@@ -561,11 +562,9 @@ async function handle(req, res) {
         stopApp(cfg);
         setTimeout(() => startApp(cfg, false), 500);
         break;
-      case "autorestart": {
-        const body = JSON.parse(await readBody(req) || "{}");
-        cfg.autoRestart = !!body.value;
+      case "autorestart":
+        cfg.autoRestart = !!pinBody.value;
         break;
-      }
       default:
         sendJson(res, 400, { ok: false, error: "unknown action" });
         return;

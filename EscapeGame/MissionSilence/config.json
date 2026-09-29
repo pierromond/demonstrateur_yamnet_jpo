@@ -11,5 +11,11 @@
   "wordPenaltyMs": 10000,
   "maxFails": 0,
   "adminPin": "445649",
-  "port": 3000
+  "port": 3000,
+  "calibration": {
+    "anchors": { "ambient": 30, "clap": 90, "reference94": 94 },
+    "windows": { "ambientMs": 3000, "clapMs": 3000, "reference94Ms": 3000, "settleMs": 300 },
+    "clapMinOverFloorDb": 20,
+    "maxStableSpreadDb": 6
+  }
 }

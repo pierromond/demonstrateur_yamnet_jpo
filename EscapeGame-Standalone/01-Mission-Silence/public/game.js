@@ -17,7 +17,6 @@ const EQUIV_GUAGE = [
   [30, "30\nchuchotement à 1 m"],
   [60, "60\nconversation à 1 m"],
   [90, "90\napplaudissement à 1 m"],
-  [110, "110\ncri à 1 m"],
   [120, "120\nseuil de douleur"]
 ];
 
@@ -46,7 +45,7 @@ const CONFIG = {
 
 let state = "IDLE";
 let dbSpl = 0;
-let smoothedDb = 0;
+let levelDb = 0;
 let peakDb = -120;
 let maxDbRun = 0;
 let attempt = 0;
@@ -63,6 +62,7 @@ let warningFading = false;
 let timeLeftMs = 300000;
 let lastFrame = 0;
 let penaltyFlashTimer = null;
+let wordPenaltyLocked = false;
 let countdownTimer = null;
 let calOffset = parseFloat(localStorage.getItem("msCalOffset") || "0");
 if (localStorage.getItem("msOffset") !== null) {
@@ -71,6 +71,12 @@ if (localStorage.getItem("msOffset") !== null) {
   localStorage.setItem("msCalOffset", String(calOffset));
 }
 let rawDb = 0;
+
+// Enveloppe commune (affichage + détection) : montée rapide, descente douce.
+const LEVEL_ATTACK = 0.6;
+const LEVEL_RELEASE = 0.08;
+let calibrating = false;
+let calibrationInfo = null;
 
 // ---- Éléments DOM ----
 const $ = (id) => document.getElementById(id);
@@ -125,7 +131,7 @@ function buildGauge(container, gaugeId, showThreshold) {
 }
 
 function pct(dB) {
-  return ((dB + 10) / 130) * 100;
+  return Math.min(100, Math.max(0, ((dB + 10) / 130) * 100));
 }
 
 function setGauge(gaugeId, dB) {
@@ -150,6 +156,30 @@ function dbColor(dB) {
 let audioCtx = null;
 let analyser = null;
 let dataArray = null;
+
+const ALARM_URL = "570462__fusionwolf3740__delta-7-detonation-alarm.wav";
+let alarmBuffer = null;
+
+async function loadAlarm() {
+  if (!audioCtx) return;
+  try {
+    const resp = await fetch(ALARM_URL);
+    if (!resp.ok) return;
+    const data = await resp.arrayBuffer();
+    alarmBuffer = await audioCtx.decodeAudioData(data);
+  } catch (err) {
+    alarmBuffer = null;
+  }
+}
+
+function playAlarm() {
+  if (!audioCtx || !alarmBuffer) return;
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  const src = audioCtx.createBufferSource();
+  src.buffer = alarmBuffer;
+  src.connect(audioCtx.destination);
+  src.start();
+}
 
 async function initMic() {
   const stream = await navigator.mediaDevices.getUserMedia({
@@ -176,7 +206,8 @@ function measureDb() {
   const dbfs = 20 * Math.log10(rms + 1e-9);
   rawDb = dbfs;
   dbSpl = dbfs + calOffset;
-  smoothedDb = smoothedDb * 0.75 + dbSpl * 0.25;
+  const k = dbSpl > levelDb ? LEVEL_ATTACK : LEVEL_RELEASE;
+  levelDb += (dbSpl - levelDb) * k;
   peakDb = Math.max(peakDb, dbSpl);
   if (state === "SEARCH" || state === "DEMO") maxDbRun = Math.max(maxDbRun, dbSpl);
 }
@@ -200,6 +231,7 @@ function enterState(name, opts) {
   }
   state = name;
   showScreen(name);
+  document.body.classList.remove("shake");
   const resume = !!(opts && opts.resume);
 
   if (name === "COUNTDOWN") {
@@ -221,6 +253,8 @@ function enterState(name, opts) {
     if (!resume) {
       attempt++;
       fails = 0;
+      timeLeftMs = CONFIG.timeLimitMs;
+      wordPenaltyLocked = false;
       $("attemptNum").textContent = String(attempt);
     }
     const we = $("wordEntry");
@@ -231,9 +265,10 @@ function enterState(name, opts) {
     }
     maxDbRun = 0;
     noiseSince = 0;
-    noiseAbove = dbSpl >= CONFIG.thresholdDb;
+    noiseAbove = levelDb >= CONFIG.explodeThresholdDb;
     searchStart = performance.now();
     lastFrame = 0;
+    if (!resume) peakDb = -120;
   }
 
   if (name === "TIMEOUT") {
@@ -273,7 +308,10 @@ function startSearch() {
 
 function explodeNow() {
   applyPenalty(CONFIG.timePenaltyMs);
-  if (state !== "TIMEOUT") enterState("EXPLODE");
+  if (state !== "TIMEOUT") {
+    playAlarm();
+    enterState("EXPLODE");
+  }
 }
 
 function explodeFinished() {
@@ -303,9 +341,9 @@ function applyPenalty(ms) {
 
 // ---- Logique de bruit (état SEARCH) ----
 function checkNoise() {
-  if (state !== "SEARCH") return;
+  if (state !== "SEARCH" || calibrating) return;
   const w = $("noiseWarning");
-  if (dbSpl >= CONFIG.explodeThresholdDb) {
+  if (levelDb >= CONFIG.explodeThresholdDb) {
     if (!noiseAbove) {
       noiseAbove = true;
       explodeNow();
@@ -315,7 +353,7 @@ function checkNoise() {
   }
   noiseAbove = false;
   const now = performance.now();
-  if (dbSpl >= CONFIG.thresholdDb) {
+  if (levelDb >= CONFIG.thresholdDb) {
     warningHideAt = 0;
     warningFading = false;
     w.classList.remove("hidden", "hiding");
@@ -336,7 +374,7 @@ function checkNoise() {
 
 // ---- Affichage ----
 function render() {
-  const shown = Math.round(smoothedDb);
+  const shown = Math.round(levelDb);
   const color = dbColor(shown);
 
   const setDb = (el, value) => {
@@ -380,6 +418,8 @@ function renderTimer() {
   const el = $("searchTimer");
   if (!el) return;
   el.textContent = fmtTime(timeLeftMs);
+  const dl = $("deadlineTime");
+  if (dl) dl.textContent = fmtTime(timeLeftMs);
   const wrap = el.parentElement;
   if (wrap) wrap.classList.toggle("low", timeLeftMs <= 60000);
 }
@@ -424,12 +464,13 @@ function pushState() {
 function sendTelemetry(force) {
   const t = {
     state,
-    db: Math.round(smoothedDb),
+    db: Math.round(levelDb),
     maxDb: Math.round(maxDbRun),
     peak: Math.round(peakDb),
     attempt,
     fails,
-    timeLeft: Math.max(0, Math.ceil(timeLeftMs / 1000))
+    timeLeft: Math.max(0, Math.ceil(timeLeftMs / 1000)),
+    calibrated: Number.isFinite(calOffset) && calibrationInfo != null
   };
   const json = JSON.stringify(t);
   if (!force && json === lastTelemetryJson) return;
@@ -448,6 +489,7 @@ sse.addEventListener("hello", (e) => {
   const d = JSON.parse(e.data);
   if (d.config) Object.assign(CONFIG, d.config);
   syncPanelFromConfig();
+  applyCalibrationFromServer(d.config ? d.config.calibration : null);
 });
 
 sse.addEventListener("cmd", (e) => {
@@ -482,6 +524,9 @@ sse.addEventListener("cmd", (e) => {
     case "word":
       CONFIG.word = d.value;
       $("wordInput").value = d.value;
+      break;
+    case "calibration":
+      applyCalibrationFromServer(d.value);
       break;
   }
   refreshGaugeMarkers();
@@ -585,11 +630,13 @@ function renderWordBoxes() {
     if (i < value.length) box.textContent = value[i];
     boxesEl.append(box);
   }
-  if (value.length === target.length && value !== target) {
+  if (!wordPenaltyLocked && value.length === target.length && value !== target) {
+    wordPenaltyLocked = true;
     applyPenalty(CONFIG.wordPenaltyMs || CONFIG.timePenaltyMs);
     boxesEl.classList.add("wrong");
     setTimeout(() => {
       boxesEl.classList.remove("wrong");
+      wordPenaltyLocked = false;
       if (input.value.toLowerCase() === value) {
         input.value = "";
         renderWordBoxes();
@@ -609,20 +656,91 @@ function togglePanel() {
   $("panelAdmin").classList.toggle("hidden");
 }
 
-function saveCal() {
-  localStorage.setItem("msCalOffset", String(calOffset));
+const CALIB_DEFAULT = {
+  anchors: { ambient: 30, clap: 90, reference94: 94 },
+  windows: { ambientMs: 3000, clapMs: 3000, reference94Ms: 3000 },
+  clapMinOverFloorDb: 20,
+  maxStableSpreadDb: 6
+};
+const CAL_LABELS = { ambient: "bruit de fond", clap: "claquement", reference94: "source 94 dB" };
+
+function calibSettings() {
+  const s = CONFIG.calibrationSettings || {};
+  return {
+    anchors: Object.assign({}, CALIB_DEFAULT.anchors, s.anchors || {}),
+    windows: Object.assign({}, CALIB_DEFAULT.windows, s.windows || {}),
+    clapMinOverFloorDb: s.clapMinOverFloorDb != null ? s.clapMinOverFloorDb : CALIB_DEFAULT.clapMinOverFloorDb,
+    maxStableSpreadDb: s.maxStableSpreadDb != null ? s.maxStableSpreadDb : CALIB_DEFAULT.maxStableSpreadDb
+  };
 }
 
-function applyCal(ref, raw) {
-  calOffset = ref - raw;
-  saveCal();
+function percentile(sorted, p) {
+  if (!sorted.length) return 0;
+  const i = Math.min(sorted.length - 1, Math.max(0, Math.round((sorted.length - 1) * p)));
+  return sorted[i];
+}
+function meanOf(a) { return a.reduce((s, v) => s + v, 0) / Math.max(1, a.length); }
+function stdOf(a) { const m = meanOf(a); return Math.sqrt(meanOf(a.map((v) => (v - m) * (v - m)))); }
+
+function setCalLive(show, text) {
+  const box = $("calLive");
+  if (!box) return;
+  box.classList.toggle("hidden", !show);
+  if (text != null && $("calLiveDb")) $("calLiveDb").textContent = text;
+}
+
+function applyCalibration(offset, method, ref, date) {
+  calOffset = offset;
+  calibrationInfo = {
+    offsetDb: offset,
+    method: method || null,
+    referenceDb: Number.isFinite(ref) ? ref : null,
+    calibratedAt: date || new Date().toISOString()
+  };
+  try { localStorage.setItem("msCalOffset", String(offset)); } catch (err) { /* stockage indisponible */ }
+  levelDb = rawDb + calOffset;
+  peakDb = -120;
+  maxDbRun = 0;
+  updateCalStatus();
+  updateCalBanner();
+}
+
+function applyCalibrationFromServer(cal) {
+  if (cal && Number.isFinite(cal.offsetDb)) {
+    applyCalibration(cal.offsetDb, cal.method, cal.referenceDb, cal.calibratedAt);
+  } else {
+    calOffset = 0;
+    calibrationInfo = null;
+    try { localStorage.removeItem("msCalOffset"); } catch (err) { /* stockage indisponible */ }
+    levelDb = rawDb;
+    updateCalStatus();
+    updateCalBanner();
+  }
 }
 
 function updateCalStatus() {
   const s = $("calStatus");
   if (!s) return;
-  s.textContent = "Calibration : décalage " + Math.round(calOffset) + " dB · gain 1 · valeur affichée sans limite basse/haute.";
+  if (calibrationInfo && Number.isFinite(calibrationInfo.offsetDb)) {
+    let date = "";
+    if (calibrationInfo.calibratedAt) {
+      const d = new Date(calibrationInfo.calibratedAt);
+      if (!isNaN(d.getTime())) date = " · " + d.toLocaleString();
+    }
+    s.textContent = "Calibration : " + (CAL_LABELS[calibrationInfo.method] || calibrationInfo.method || "?") +
+      " · décalage " + Math.round(calibrationInfo.offsetDb) + " dB" + date;
+  } else {
+    s.textContent = "Calibration : non faite — les valeurs affichées sont indicatives.";
+  }
 }
+
+function updateCalBanner() {
+  const b = $("calBanner");
+  if (!b) return;
+  const ok = calibrationInfo != null && Number.isFinite(calibrationInfo.offsetDb);
+  b.classList.toggle("hidden", ok);
+}
+
 function syncPanelFromConfig() {
   $("thSlider").value = CONFIG.thresholdDb;
   $("thLabel").textContent = CONFIG.thresholdDb;
@@ -632,80 +750,111 @@ function syncPanelFromConfig() {
   $("wordInput").value = CONFIG.word;
   refreshGaugeMarkers();
   updateCalStatus();
+  updateCalBanner();
 }
 
 function postCmd(action, value) {
   const pin = prompt("Code animateur (config.json → adminPin) :", "");
-  if (pin === null) return;
-  fetch("cmd", {
+  if (pin === null) return Promise.resolve(null);
+  return fetch("cmd", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ pin, action, value })
   })
     .then((r) => r.json())
     .then((d) => {
-      if (!d.ok) alert("Erreur : " + (d.error || "inconnue"));
-      else if (d.config) Object.assign(CONFIG, d.config), syncPanelFromConfig();
+      if (!d.ok) { alert("Erreur : " + (d.error || "inconnue")); return d; }
+      if (d.config) { Object.assign(CONFIG, d.config); syncPanelFromConfig(); }
+      return d;
     })
-    .catch(() => alert("Serveur injoignable."));
+    .catch(() => { alert("Serveur injoignable."); return null; });
 }
 
-$("calFloor").addEventListener("click", async () => {
-  if (!analyser) return;
-  $("calResult").textContent = "Silence… attendez 3 s.";
+async function collectSamples(durationMs, onTick) {
   const samples = [];
-  for (let i = 0; i < 12; i++) {
+  const end = performance.now() + durationMs;
+  while (performance.now() < end) {
     measureDb();
     samples.push(rawDb);
-    await new Promise((r) => setTimeout(r, 250));
-  }
-  samples.sort((a, b) => a - b);
-  applyCal(40, samples[Math.floor(samples.length / 2)]);
-  updateCalStatus();
-  $("calResult").textContent = "Calibré : le calme doit afficher ~40 dB.";
-});
-
-$("calClap").addEventListener("click", async () => {
-  if (!analyser) return;
-  $("calResult").textContent = "Tapez des mains fort, près du micro !";
-  let peak = -120;
-  for (let i = 0; i < 30; i++) {
-    measureDb();
-    peak = Math.max(peak, rawDb);
+    if (onTick) onTick(Math.round(levelDb));
     await new Promise((r) => setTimeout(r, 50));
   }
-  applyCal(90, peak);
-  updateCalStatus();
-  $("calResult").textContent = "Calibré : un claquement doit afficher ~90 dB.";
-});
+  return samples;
+}
 
-$("cal94").addEventListener("click", async () => {
-  if (!analyser) return;
-  $("calResult").textContent = "Allumez le calibrateur 94 dB (1 kHz) contre le micro… mesure en cours (3 s).";
-  let sum = 0;
-  let n = 0;
-  for (let i = 0; i < 60; i++) {
-    measureDb();
-    sum += rawDb;
-    n++;
-    await new Promise((r) => setTimeout(r, 50));
+async function calibrate(method) {
+  if (calibrating) return;
+  if (!analyser) { $("calResult").textContent = "Micro indisponible."; return; }
+  const s = calibSettings();
+  const ref = s.anchors[method];
+  const win = { ambient: s.windows.ambientMs, clap: s.windows.clapMs, reference94: s.windows.reference94Ms }[method] || 3000;
+  const instructions = {
+    ambient: "Restez silencieux : mesure du bruit de fond…",
+    clap: "Tapez une fois des mains fort, près du micro !",
+    reference94: "Placez le calibrateur 94 dB (1 kHz) contre le micro…"
+  };
+  calibrating = true;
+  $("calResult").textContent = instructions[method];
+  setCalLive(true, "--");
+  try {
+    const samples = await collectSamples(win, (live) => setCalLive(true, String(live)));
+    samples.sort((a, b) => a - b);
+    const floor = percentile(samples, 0.2);
+    let measured;
+    let error = null;
+    if (method === "ambient") {
+      measured = floor;
+      const spread = percentile(samples, 0.9) - floor;
+      if (spread > s.maxStableSpreadDb) error = "Ambiance instable (" + Math.round(spread) + " dB d'écart) — réessayez au calme.";
+    } else if (method === "clap") {
+      measured = samples[samples.length - 1];
+      if (measured - floor < s.clapMinOverFloorDb) error = "Claquement non détecté — tapez plus fort et plus près du micro.";
+    } else {
+      measured = meanOf(samples);
+      const spread = 2 * stdOf(samples);
+      if (spread > s.maxStableSpreadDb) error = "Signal instable (" + spread.toFixed(1) + " dB) — vérifiez le calibrateur.";
+    }
+    if (error) { $("calResult").textContent = error; return; }
+    const offset = ref - measured;
+    if (!Number.isFinite(offset) || offset < -20 || offset > 160) {
+      $("calResult").textContent = "Calibration hors limites — vérifiez le niveau sonore et réessayez.";
+      return;
+    }
+    applyCalibration(offset, method, ref);
+    $("calResult").textContent = "Calibré (" + CAL_LABELS[method] + ", " + Math.round(offset) + " dB) — enregistrement…";
+    const r = await postCmd("calibration", { offsetDb: offset, method, referenceDb: ref });
+    if (r && r.ok) {
+      $("calResult").textContent = "Calibré et enregistré (" + CAL_LABELS[method] + ", " + Math.round(offset) + " dB).";
+    } else if (r) {
+      $("calResult").textContent = "Calibré localement (" + Math.round(offset) + " dB), serveur non enregistré.";
+    } else {
+      $("calResult").textContent = "Calibré localement (" + Math.round(offset) + " dB), serveur injoignable.";
+    }
+  } finally {
+    calibrating = false;
+    setCalLive(false);
+    updateCalStatus();
+    updateCalBanner();
   }
-  applyCal(94, sum / n);
-  updateCalStatus();
-  $("calResult").textContent = "Calibré : le calibrateur doit afficher ~94 dB.";
-});
+}
 
+async function resetCalibration() {
+  applyCalibrationFromServer(null);
+  $("calResult").textContent = "Calibration réinitialisée.";
+  await postCmd("calibrationReset", null);
+}
+
+$("calAmbient").addEventListener("click", () => calibrate("ambient"));
+$("calClap").addEventListener("click", () => calibrate("clap"));
+$("calReference").addEventListener("click", () => calibrate("reference94"));
 $("calReset").addEventListener("click", () => {
-  calOffset = 0;
-  saveCal();
-  updateCalStatus();
-  $("calResult").textContent = "Calibration réinitialisée : décalage 0 dB.";
+  if (confirm("Effacer la calibration enregistrée ?")) resetCalibration();
 });
 
 $("thSlider").addEventListener("input", (e) => {
   const v = Number(e.target.value);
-  CONFIG.thresholdDb = v;
-  $("thLabel").textContent = v;
+  CONFIG.thresholdDb = Math.min(v, CONFIG.explodeThresholdDb);
+  $("thLabel").textContent = CONFIG.thresholdDb;
   refreshGaugeMarkers();
 });
 $("thSlider").addEventListener("change", (e) => postCmd("threshold", e.target.value));
@@ -713,7 +862,7 @@ $("thSlider").addEventListener("change", (e) => postCmd("threshold", e.target.va
 $("exSlider").addEventListener("input", (e) => {
   const v = Number(e.target.value);
   CONFIG.explodeThresholdDb = Math.max(v, CONFIG.thresholdDb);
-  $("exLabel").textContent = v;
+  $("exLabel").textContent = CONFIG.explodeThresholdDb;
   refreshGaugeMarkers();
 });
 $("exSlider").addEventListener("change", (e) => postCmd("explodeThreshold", e.target.value));
@@ -747,10 +896,13 @@ async function boot() {
   }
   $("btnStart").classList.add("hidden");
   $("app").classList.remove("hidden");
+  loadAlarm();
   buildGauge($("gaugeIdle"), "gIdle", true);
   buildGauge($("gaugeSearch"), "gSearch", true);
   buildGauge($("gaugeDemo"), "gDemo", true);
   refreshGaugeMarkers();
+  updateCalStatus();
+  updateCalBanner();
   enterState("IDLE");
   setInterval(() => sendTelemetry(false), 300);
   tick();

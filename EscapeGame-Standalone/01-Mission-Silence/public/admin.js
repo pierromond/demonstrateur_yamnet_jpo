@@ -3,9 +3,11 @@
 const $ = (id) => document.getElementById(id);
 
 let pin = localStorage.getItem("msAdminPin") || "";
-let config = { thresholdDb: 55, explodeThresholdDb: 80, code: "----", word: "TOUCHE" };
+let config = { thresholdDb: 55, explodeThresholdDb: 65, code: "----", word: "—", calibration: null };
 let state = "IDLE";
-let telemetry = { db: 0, maxDb: 0, peak: 0, attempt: 0, fails: 0, timeLeft: null };
+let telemetry = { db: 0, maxDb: 0, peak: 0, attempt: 0, fails: 0, timeLeft: null, calibrated: false };
+
+const CAL_LABELS = { ambient: "bruit de fond", clap: "claquement", reference94: "source 94 dB" };
 
 const STATE_LABELS = {
   IDLE: "REPOS",
@@ -44,6 +46,7 @@ function render() {
     : db >= config.thresholdDb ? "#f1c40f" : "#2ecc71";
   $("needle").style.left = pct(db) + "%";
   $("thMark").style.left = pct(config.thresholdDb) + "%";
+  $("exMark").style.left = pct(config.explodeThresholdDb) + "%";
   $("dbMax").textContent = "max : " + telemetry.maxDb + " dB";
 
   $("stState").textContent = STATE_LABELS[state] || state;
@@ -56,8 +59,12 @@ function render() {
 
   $("cfgTh").textContent = config.thresholdDb;
   $("cfgEx").textContent = config.explodeThresholdDb;
-  $("cfgCode").value = config.code;
+  if (document.activeElement !== $("cfgCode")) $("cfgCode").value = config.code;
   $("cfgWord").textContent = config.word;
+  const cal = config.calibration;
+  $("cfgCalib").textContent = (cal && Number.isFinite(cal.offsetDb))
+    ? (CAL_LABELS[cal.method] || cal.method || "?") + " (" + Math.round(cal.offsetDb) + " dB)"
+    : (telemetry.calibrated ? "locale (non enregistrée)" : "non faite");
 }
 
 function post(action, value) {
@@ -95,7 +102,18 @@ function connect() {
     render();
   });
 
-  es.addEventListener("cmd", () => {});
+  es.addEventListener("cmd", (e) => {
+    const d = JSON.parse(e.data);
+    if (d.action === "threshold") config.thresholdDb = d.value;
+    else if (d.action === "explodeThreshold") config.explodeThresholdDb = d.value;
+    else if (d.action === "code") config.code = d.value;
+    else if (d.action === "word") config.word = d.value;
+    else if (d.action === "calibration") {
+      config.calibration = d.value;
+      telemetry.calibrated = !!(d.value && Number.isFinite(d.value.offsetDb));
+    }
+    render();
+  });
   es.onerror = () => { $("connStatus").textContent = "déconnecté — reconnexion…"; };
 }
 

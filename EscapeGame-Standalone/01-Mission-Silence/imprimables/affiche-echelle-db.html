@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Affiche — L'échelle du bruit (dB)</title>
+<style>
+  @page { size: A4 portrait; margin: 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #111; }
+  h1 { font-size: 30pt; text-align: center; letter-spacing: 3px; margin-bottom: 2mm; }
+  .sub { text-align: center; font-size: 13pt; color: #444; margin-bottom: 8mm; }
+  .scale { position: relative; width: 70mm; height: 235mm; margin: 0 auto; border: 2px solid #111; border-radius: 4mm; overflow: hidden; }
+  .zone { position: absolute; left: 0; right: 0; }
+  .z1 { background: #d5f5e3; }
+  .z2 { background: #fef9e7; }
+  .z3 { background: #fdecea; }
+  .row { position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: 4mm; }
+  .row .line { position: relative; width: 70mm; }
+  .row .line::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1.5px solid #555; }
+  .row .val { width: 22mm; text-align: right; font-weight: 700; font-size: 16pt; padding-right: 2mm; }
+  .row .lab { width: 60mm; font-size: 11.5pt; padding-left: 3mm; }
+  .note { margin-top: 10mm; background: #f4f6f7; border-left: 5px solid #2ecc71; padding: 5mm 6mm; font-size: 12pt; }
+  .note b { display: block; margin-bottom: 2mm; }
+</style>
+</head>
+<body>
+  <h1>L'ÉCHELLE DU BRUIT</h1>
+  <p class="sub">Le décibel (dB) mesure l'intensité du son</p>
+
+  <div class="scale">
+    <div class="zone z1" style="top:0; height:38.5%"></div>
+    <div class="zone z2" style="top:38.5%; height:30.8%"></div>
+    <div class="zone z3" style="top:69.3%; height:30.7%"></div>
+
+    <div class="row" style="bottom: 0%;"><div class="val">0</div><div class="line"></div><div class="lab">Seuil d'audition</div></div>
+    <div class="row" style="bottom: 16.7%;"><div class="val">20</div><div class="line"></div><div class="lab">Feuille qui tombe</div></div>
+    <div class="row" style="bottom: 25%;"><div class="val">30</div><div class="line"></div><div class="lab">Chuchotement</div></div>
+    <div class="row" style="bottom: 33.3%;"><div class="val">40</div><div class="line"></div><div class="lab">Bibliothèque</div></div>
+    <div class="row" style="bottom: 50%;"><div class="val">60</div><div class="line"></div><div class="lab">Conversation</div></div>
+    <div class="row" style="bottom: 58.3%;"><div class="val">70</div><div class="line"></div><div class="lab">Aspirateur</div></div>
+    <div class="row" style="bottom: 75%;"><div class="val">90</div><div class="line"></div><div class="lab">Applaudissement</div></div>
+    <div class="row" style="bottom: 91.7%;"><div class="val">110</div><div class="line"></div><div class="lab">Cri</div></div>
+    <div class="row" style="bottom: 100%;"><div class="val">120</div><div class="line"></div><div class="lab">Seuil de douleur</div></div>
+  </div>
+
+  <div class="note">
+    <b>À retenir :</b>
+    L'échelle des décibels est logarithmique : ajouter 10 dB, c'est un son 10 fois plus intense !
+    Un chuchotement (30 dB) est 1000 fois plus faible qu'une conversation (60 dB).
+    Dans la salle, restez sous le seuil affiché sur l'ordinateur : chuchotez, ne courez pas,
+    ne claquez pas les mains.
+  </div>
+</body>
+</html>
