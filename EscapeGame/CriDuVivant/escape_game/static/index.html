@@ -610,6 +610,7 @@ function restartGame() {
   currentRound = 0;
   solvedRounds = new Set();
   sustainTimers = new Array(config.animals.length).fill(0);
+  lastTimestamp = null;
   document.getElementById('congratsOverlay').classList.add('hidden');
   riddleZone.classList.remove('hidden');
   heardZone.classList.remove('hidden');

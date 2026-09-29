@@ -5,6 +5,7 @@ import os
 import numpy as np
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse
+from starlette.concurrency import run_in_threadpool
 
 from classifier import YamnetClassifier
 
@@ -55,7 +56,7 @@ async def websocket_endpoint(ws: WebSocket):
             chunk_len -= to_copy
 
             if buffer_idx >= WINDOW_SAMPLES:
-                scores = classifier.predict(buffer)
+                scores = await run_in_threadpool(classifier.predict, buffer)
 
                 filtered = {}
                 for animal in config["animals"]:

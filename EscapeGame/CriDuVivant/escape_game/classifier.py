@@ -1,6 +1,7 @@
 import csv
 import math
 import os
+import threading
 
 import numpy as np
 
@@ -18,6 +19,9 @@ class YamnetClassifier:
         self.waveform_input_index = input_details[0]["index"]
         output_details = self.interpreter.get_output_details()
         self.scores_output_index = output_details[0]["index"]
+
+        self._lock = threading.Lock()
+        self._alloc_len = None
 
         csv_path = os.path.join(os.path.dirname(__file__), "yamnet_class_threshold_map.csv")
         if not os.path.exists(csv_path):
@@ -57,12 +61,15 @@ class YamnetClassifier:
         samples = np.asarray(audio_samples, dtype=np.float32).flatten()
         samples = self._preprocess(samples)
 
-        self.interpreter.resize_tensor_input(self.waveform_input_index,
-                                             [len(samples)], strict=True)
-        self.interpreter.allocate_tensors()
-        self.interpreter.set_tensor(self.waveform_input_index, samples)
-        self.interpreter.invoke()
-        scores = self.interpreter.get_tensor(self.scores_output_index)
+        with self._lock:
+            if self._alloc_len != len(samples):
+                self.interpreter.resize_tensor_input(self.waveform_input_index,
+                                                     [len(samples)], strict=True)
+                self.interpreter.allocate_tensors()
+                self._alloc_len = len(samples)
+            self.interpreter.set_tensor(self.waveform_input_index, samples)
+            self.interpreter.invoke()
+            scores = self.interpreter.get_tensor(self.scores_output_index)
+            prediction = np.max(scores, axis=0)
 
-        prediction = np.max(scores, axis=0)
         return dict(zip(self.class_names, [float(v) for v in prediction]))
