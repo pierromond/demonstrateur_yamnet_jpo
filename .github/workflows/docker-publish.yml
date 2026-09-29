@@ -6,8 +6,6 @@ on:
     branches: [ main ]
     paths:
       - "EscapeGame/**"
-      - "docker-compose.yml"
-      - ".github/workflows/docker-publish.yml"
 
 concurrency:
   group: docker-publish-${{ github.ref }}

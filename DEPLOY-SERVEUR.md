@@ -15,9 +15,14 @@ par leurs ports (ou par HTTPS avec un domaine).
 ```bash
 git clone https://github.com/pierromond/demonstrateur_yamnet_jpo.git
 cd demonstrateur_yamnet_jpo
-git checkout deploy-serveur
+git checkout main
 
-docker compose up -d --build
+# Images publiées sur GHCR (recommandé, pas de build) :
+docker compose pull
+docker compose up -d
+
+# Ou reconstruction locale :
+# docker compose up -d --build
 ```
 
 Les 4 stations répondent alors sur le serveur :
@@ -54,7 +59,12 @@ Après modification : `docker compose up -d --build <station>`.
 ## Notes
 
 - Les conteneurs redémarrent automatiquement (`restart: unless-stopped`).
-- Le modèle YAMNet (16 Mo) est inclus dans l'image du Cri du Vivant
-  (premier build : ~5-10 min).
+- Les images sont construites et publiées automatiquement sur GHCR par la GitHub Action
+  `.github/workflows/docker-publish.yml` (push sur `main`) :
+  `ghcr.io/pierromond/escape-mission-silence`, `…-spectro-masked`, `…-chladni`, `…-cri-du-vivant`.
+  Tags : `latest`, date `AAAA-MM-JJ`, `sha` court. Elles peuvent être privées : dans ce cas
+  `docker login ghcr.io` avec un token ayant `read:packages`.
+- Le modèle YAMNet (16 Mo) est téléchargé au build et inclus dans l'image du Cri du Vivant
+  (premier build local : ~5-10 min ; inutile avec les images publiées).
 - Pas de dépendance à Tailscale ni à aucun tunnel : les stations sont exposées
   directement par le serveur.

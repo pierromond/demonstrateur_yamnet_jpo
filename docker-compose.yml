@@ -1,32 +1,36 @@
 services:
   # Les 4 stations, une par conteneur. Chaque station expose son port.
+  # Images publiées sur GHCR par .github/workflows/docker-publish.yml :
+  #   docker compose pull && docker compose up -d      (utilise les images publiées)
+  #   docker compose up -d --build                     (reconstruit en local)
+  # Tags disponibles : latest, date (AAAA-MM-JJ), sha court.
   mission-silence:
+    image: ghcr.io/pierromond/escape-mission-silence:latest
     build: ./EscapeGame/MissionSilence
-    image: escape-mission-silence
     container_name: escape-mission-silence
     ports:
       - "3000:3000"
     restart: unless-stopped
 
   spectro-masked:
+    image: ghcr.io/pierromond/escape-spectro-masked:latest
     build: ./EscapeGame/SpectroMasked
-    image: escape-spectro-masked
     container_name: escape-spectro-masked
     ports:
       - "4000:4000"
     restart: unless-stopped
 
   chladni:
+    image: ghcr.io/pierromond/escape-chladni:latest
     build: ./EscapeGame/Chladni
-    image: escape-chladni
     container_name: escape-chladni
     ports:
       - "4500:4500"
     restart: unless-stopped
 
   cri-du-vivant:
+    image: ghcr.io/pierromond/escape-cri-du-vivant:latest
     build: ./EscapeGame/CriDuVivant
-    image: escape-cri-du-vivant
     container_name: escape-cri-du-vivant
     ports:
       - "8765:8765"
