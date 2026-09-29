@@ -1,5 +1,8 @@
 .idea
 *.tflite
+!EscapeGame/CriDuVivant/yamnet.tflite
+# Calibration micro locale (spécifique à la machine)
+calibration.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
