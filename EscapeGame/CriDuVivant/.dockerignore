@@ -11,3 +11,5 @@ pyproject.toml
 start_all.sh
 start_record.sh
 start_yamnet.sh
+
+yamnet.tflite
