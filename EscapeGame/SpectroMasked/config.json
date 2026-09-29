@@ -8,7 +8,11 @@
     { "name": "Open hats", "file": "openhats(1).wav", "key": "t", "midi": 51 },
     { "name": "Open hats 2", "file": "openhats.wav", "key": "y", "midi": 54 },
     { "name": "Chants troglodytes", "file": "Troglodytes_songs.wav", "key": "u", "midi": 58 },
-    { "name": "Vague", "file": "Wave.wav", "key": "i", "midi": 63 }
+    { "name": "Vague", "file": "Wave.wav", "key": "i", "midi": 63 },
+    { "name": "Try again (Lexie)", "file": "439187__fourthwoods__lexie-try-again.ogg", "midi": 65, "color": "#ff7f00" },
+    { "name": "Synth montée", "file": "31994__procynic__pcyc_synthtop_moveup.wav", "midi": 13, "color": "#00ffff" },
+    { "name": "Try again", "file": "417795__lorenzothegreat__try-again.wav", "midi": 61, "color": "#ff00ff" },
+    { "name": "Laser sci-fi", "file": "615809__flyingsaucerinvasion__sci-fi-laser-blaster-shot-3.wav", "midi": 67, "color": "#ffff00" }
   ],
   "pads": [
     { "note": 11, "vel": 21, "color": "#00ff00", "label": "Rang 1 · Colonne 1" },

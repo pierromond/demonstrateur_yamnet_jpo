@@ -44,6 +44,10 @@ const server = http.createServer((req, res) => {
     sendJson(res, 400, { ok: false, error: "bad path" });
     return;
   }
+  if (/[\u0000-\u001f\u007f]/.test(pathname)) {
+    sendJson(res, 400, { ok: false, error: "bad path" });
+    return;
+  }
 
   if (pathname === "/config") {
     const audioDir = path.join(ROOT, "audio");

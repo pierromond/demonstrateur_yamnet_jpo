@@ -164,7 +164,7 @@ async function loadSounds() {
         if (!res.ok) throw new Error("HTTP " + res.status);
         const buf = await ctx.decodeAudioData(await res.arrayBuffer());
         buffers.set(s.file, buf);
-        soundByKey.set(s.key.toLowerCase(), s);
+        if (s.key) soundByKey.set(String(s.key).toLowerCase(), s);
         if (s.midi != null) soundByMidi.set(s.midi, s);
         loaded++;
         $("lastSound").textContent = "chargement des sons… " + loaded + "/" + data.sounds.length;
@@ -172,7 +172,7 @@ async function loadSounds() {
         $("lastSound").textContent = "son introuvable : " + s.file;
       }
       rows.push(
-        "<tr><td><kbd>" + s.key + "</kbd></td>" +
+        "<tr><td>" + (s.key ? "<kbd>" + s.key + "</kbd>" : "<span class=\"hint\">pad</span>") + "</td>" +
         "<td>" + s.name + "</td>" +
         "<td>" + (s.color
           ? "<span title=\"LED launchpad\" style=\"display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid #2a3a55;background:" + s.color + "\"></span>"
@@ -187,7 +187,7 @@ async function loadSounds() {
         "<td class=\"hint\">MIDI " + p.note + padPos(p.note) + "</td></tr>"
       );
     }
-    $("mapTable").innerHTML = "<tr><td class=\"hint\">Touche</td><td class=\"hint\">Son</td><td class=\"hint\">LED</td><td class=\"hint\">Note</td></tr>" + rows.join("");
+    $("mapTable").innerHTML = "<tr><td class=\"hint\">Touche/Pad</td><td class=\"hint\">Son</td><td class=\"hint\">LED</td><td class=\"hint\">Note</td></tr>" + rows.join("");
     $("lastSound").textContent = loaded + "/" + data.sounds.length + " sons chargés";
   } finally {
     loading = false;
