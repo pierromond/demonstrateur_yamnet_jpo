@@ -1,6 +1,7 @@
 .idea
 *.tflite
 !EscapeGame/CriDuVivant/yamnet.tflite
+!EscapeGame/CriDuVivant/browser/yamnet.tflite
 # Calibration micro locale (spécifique à la machine)
 calibration.json
 # Byte-compiled / optimized / DLL files

@@ -1,6 +1,7 @@
 @echo off
-rem Mission Silence - lancement autonome (Windows)
-rem Aucune installation : un runtime Node.js portable peut etre embarque dans runtime\.
+rem Mission Silence - version autonome (Windows)
+rem Reconnaissance locale dans le navigateur, aucun serveur applicatif.
+rem Aucune installation : Node.js est embarque dans runtime\ si present.
 setlocal
 cd /d "%~dp0"
 
@@ -17,8 +18,7 @@ if errorlevel 1 (
 
 echo Demarrage de Mission Silence...
 echo   Page : http://localhost:3000
-echo   Arret : fermer la fenetre noire ou faites Ctrl+C dedans
-echo.
-start "Mission Silence" cmd /k "%NODE% server.js"
+echo   Arret : fermer cette fenetre
+start "Mission Silence" cmd /k "%NODE% serve.js"
 timeout /t 2 /nobreak >nul
 start "" "http://localhost:3000"

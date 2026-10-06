@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Mission Silence — lancement autonome (Linux / Mac)
-# Aucune installation : un runtime Node.js portable peut être embarqué dans runtime/.
+# Mission Silence — version autonome (Linux / Mac)
+# Reconnaissance locale dans le navigateur, aucun serveur applicatif.
+# Aucune installation : Node.js est embarqué dans runtime/ si présent.
 cd "$(dirname "$0")"
 
 NODE=""
@@ -22,7 +23,7 @@ fi
 echo "Démarrage de Mission Silence…"
 echo "  Page : http://localhost:3000"
 echo "  Arrêt : Ctrl+C ici"
-"$NODE" server.js &
+"$NODE" serve.js &
 SERVER_PID=$!
 sleep 2
 if command -v xdg-open >/dev/null 2>&1; then

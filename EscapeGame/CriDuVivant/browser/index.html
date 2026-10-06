@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Cri du Vivant — Escape Game</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    background: #0a1a0a;
+    color: #a0e0a0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem;
+  }
+
+  h1 {
+    font-size: 4rem;
+    letter-spacing: 0.15em;
+    color: #60ff60;
+    text-shadow: 0 0 40px rgba(96, 255, 96, 0.5);
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .riddle-zone {
+    max-width: 900px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    padding: 1.2rem 1.5rem 1.4rem;
+    background: #0d1f0d;
+    border: 3px solid #1a3a1a;
+    border-radius: 14px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+  }
+
+  .riddle-zone.hot { border-color: #d4a020; box-shadow: 0 0 30px rgba(212, 160, 32, 0.25); }
+
+  .riddle-num {
+    font-size: 1.6rem;
+    color: #d4a020;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.6rem;
+  }
+
+  .riddle-text {
+    font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+    color: #a0e0a0;
+    line-height: 1.3;
+    min-height: 3.4rem;
+  }
+
+  .progress-bar {
+    margin-top: 1.1rem;
+    display: flex;
+    gap: 0.7rem;
+    justify-content: center;
+  }
+
+  .progress-bar .segment {
+    flex: 1;
+    max-width: 90px;
+    height: 1.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 8px;
+    background: #122412;
+    border: 2px solid #244424;
+    color: #3a5a3a;
+    transition: all 0.3s ease;
+  }
+
+  .progress-bar .segment.filled {
+    background: #1e4620;
+    border-color: #40a040;
+    color: #a0ffa0;
+    box-shadow: 0 0 14px rgba(64, 160, 64, 0.5);
+  }
+
+  .progress-bar .segment.current {
+    border-color: #d4a020;
+    color: #e0c060;
+    animation: pulse-seg 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse-seg {
+    0%, 100% { box-shadow: 0 0 6px rgba(212, 160, 32, 0.3); }
+    50% { box-shadow: 0 0 22px rgba(212, 160, 32, 0.7); }
+  }
+
+  .heard-zone {
+    max-width: 900px;
+    width: 100%;
+    min-height: 9rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem;
+    background: #0d1f0d;
+    border: 3px solid #1a3a1a;
+    border-radius: 14px;
+    font-size: 2rem;
+    color: #608060;
+    text-align: center;
+  }
+
+  .heard-result { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; transition: opacity 0.6s ease; }
+
+  .heard-result.fading { opacity: 0; }
+
+  .heard-result .heard-emoji { font-size: 4.2rem; line-height: 1; }
+
+  .heard-result .heard-name { font-size: 1.8rem; font-weight: bold; }
+
+  .heard-result .heard-msg { font-size: 1.6rem; }
+
+  .heard-result.bad { color: #ff9b8a; }
+  .heard-result.bad .heard-name { color: #ffb3a5; }
+  .heard-result.good { color: #d4a020; }
+  .heard-result.good .heard-name { color: #ffe080; }
+  .heard-result.good .heard-emoji { animation: pulse-emoji 0.6s ease-in-out infinite alternate; }
+
+  .target-bar-zone {
+    max-width: 900px;
+    width: 100%;
+    margin-bottom: 1.2rem;
+    padding: 0.9rem 1.2rem;
+    background: #0d1f0d;
+    border: 3px solid #1a3a1a;
+    border-radius: 14px;
+    text-align: center;
+  }
+
+  .target-bar-label {
+    font-size: 1.3rem;
+    color: #80a080;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.1em;
+  }
+
+  .target-bar {
+    position: relative;
+    height: 1.8rem;
+    background: #122412;
+    border: 2px solid #244424;
+    border-radius: 9px;
+    overflow: hidden;
+  }
+
+  .target-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2a6a2a, #40a040);
+    transition: width 0.12s linear;
+  }
+
+  .target-bar-zone.good .target-fill { background: linear-gradient(90deg, #6b5700, #d4a020); }
+  .target-bar-zone.hot { border-color: #d4a020; box-shadow: 0 0 24px rgba(212, 160, 32, 0.3); }
+
+  .target-th {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 3px;
+    background: #fff;
+    opacity: 0.85;
+    border-radius: 2px;
+  }
+
+  .target-pct {
+    margin-top: 0.4rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #a0e0a0;
+  }
+
+  .target-bar-zone.good .target-pct { color: #ffe080; }
+  .heard-result.bad .heard-name { color: #ffb3a5; }
+  .heard-result.good { color: #d4a020; }
+  .heard-result.good .heard-name { color: #ffe080; }
+  .heard-result.good .heard-emoji { animation: pulse-emoji 0.6s ease-in-out infinite alternate; }
+
+  @keyframes pulse-emoji {
+    from { transform: scale(1); }
+    to { transform: scale(1.15); }
+  }
+
+  .big-message {
+    margin-top: 0.3rem;
+    text-align: center;
+    font-size: clamp(1.6rem, 4.2vw, 2.6rem);
+    font-weight: bold;
+    color: #c0ffc0;
+    min-height: 2.6rem;
+    line-height: 1.2;
+    text-shadow: 0 0 20px rgba(192, 255, 192, 0.5);
+    transition: opacity 0.6s ease;
+  }
+
+  .big-message.fade { opacity: 0; }
+
+  .secret-display {
+    margin-top: 0.4rem;
+    text-align: center;
+    font-size: clamp(3rem, 9vw, 5.5rem);
+    font-weight: bold;
+    color: #ffc830;
+    text-shadow: 0 0 40px rgba(255, 200, 48, 0.9);
+    min-height: 4.4rem;
+    line-height: 1.1;
+    letter-spacing: 0.3em;
+  }
+
+  .info-box {
+    max-width: 760px;
+    width: 100%;
+    margin: 0.5rem auto 0;
+    padding: 0.5rem 0.9rem;
+    background: rgba(12, 22, 38, 0.85);
+    border: 2px solid #2a4a7a;
+    border-radius: 14px;
+    font-size: clamp(0.85rem, 2.2vw, 1.1rem);
+    line-height: 1.35;
+    text-align: left;
+    color: #cfe0f5;
+  }
+
+  .info-box h2 {
+    margin: 0 0 0.3rem;
+    font-size: 1.3rem;
+    color: #8fd0ff;
+  }
+
+  .final-hint {
+    max-width: 760px;
+    width: 100%;
+    margin: 0.5rem auto 0;
+    padding: 0.5rem 0.9rem;
+    background: rgba(40, 28, 4, 0.9);
+    border: 3px solid #ffc830;
+    border-radius: 14px;
+    font-size: clamp(1rem, 2.6vw, 1.4rem);
+    font-weight: bold;
+    text-align: center;
+    color: #ffe080;
+    text-shadow: 0 0 18px rgba(255, 200, 48, 0.4);
+    animation: pulse-emoji 1s ease-in-out infinite alternate;
+    line-height: 1.3;
+  }
+
+  .final-hint.hidden { display: none; }
+
+  .status-bar {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 2rem;
+    min-height: 2.5rem;
+    font-weight: bold;
+  }
+
+  .status-bar.success { color: #ffc830; font-size: 2.6rem; }
+
+  .human-banner {
+    max-width: 900px;
+    width: 100%;
+    min-height: 7.2rem;
+    margin-bottom: 1.2rem;
+    padding: 1rem 1.6rem;
+    background: rgba(28, 8, 8, 0.9);
+    border: 4px solid #e74c3c;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    box-shadow: 0 0 40px rgba(231, 76, 60, 0.4), inset 0 0 30px rgba(231, 76, 60, 0.12);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease;
+  }
+
+  .human-banner.shown { opacity: 1; visibility: visible; }
+  .human-banner.fading { opacity: 0; }
+
+  .human-banner-emoji {
+    font-size: clamp(3.6rem, 9vw, 6rem);
+    line-height: 1;
+    animation: wiggle 0.55s ease-in-out infinite;
+  }
+
+  .human-banner-text {
+    font-size: clamp(1.6rem, 4.2vw, 2.8rem);
+    font-weight: 900;
+    color: #ffd9a8;
+    text-shadow: 0 0 24px rgba(255, 200, 48, 0.8);
+    animation: flash-msg 0.9s ease-in-out infinite;
+  }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-7deg) scale(1); }
+    50% { transform: rotate(7deg) scale(1.12); }
+  }
+
+  @keyframes flash-msg {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .congrats-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    background: rgba(5, 20, 5, 0.94);
+  }
+
+  .congrats-emoji {
+    font-size: clamp(8rem, 30vw, 18rem);
+    line-height: 1;
+    animation: pulse-emoji 0.5s ease-in-out infinite alternate;
+  }
+
+  .congrats-text {
+    font-size: clamp(2.2rem, 6.5vw, 4.2rem);
+    font-weight: bold;
+    color: #ffe080;
+    text-shadow: 0 0 30px rgba(255, 200, 48, 0.6);
+    text-align: center;
+    padding: 0 1rem;
+  }
+
+  .mic-status {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1rem;
+    color: #406040;
+  }
+
+  .mic-status.active { color: #60a060; }
+  .mic-status.error { color: #a04040; }
+
+  .reset-btn {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    background: transparent;
+    border: none;
+    color: #1a3a1a;
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0.3;
+    z-index: 100;
+    font-family: 'Courier New', monospace;
+  }
+
+  .reset-btn:hover { opacity: 0.9; color: #60ff60; }
+
+  .admin-hint {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    font-size: 0.7rem;
+    color: #304030;
+    opacity: 0.7;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<button class="reset-btn" title="Reset" onclick="location.reload()">⟳</button>
+
+<div class="mic-status" id="micStatus">🔇 Micro inactif</div>
+
+<h1>🔬 Le Cri du Vivant</h1>
+
+<div class="riddle-zone" id="riddleZone">
+  <div class="riddle-num" id="riddleNum">Énigme 1/4</div>
+  <div class="riddle-text" id="riddleText"></div>
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div class="human-banner" id="humanBanner">
+  <span class="human-banner-emoji">🧑</span>
+  <span class="human-banner-text" id="humanBannerText"></span>
+</div>
+
+<div class="heard-zone" id="heardZone">
+  <span id="heardIdle">👂 J'écoute…</span>
+  <div class="heard-result hidden" id="heardResult">
+    <span class="heard-emoji" id="heardEmoji"></span>
+    <span class="heard-name" id="heardName"></span>
+    <span class="heard-msg" id="heardMsg"></span>
+  </div>
+</div>
+
+<div class="target-bar-zone" id="targetBarZone">
+  <div class="target-bar-label">🎯 Proximité de l'animal recherché</div>
+  <div class="target-bar">
+    <div class="target-fill" id="targetFill"></div>
+    <div class="target-th" id="targetTh"></div>
+  </div>
+  <div class="target-pct" id="targetPct">0 %</div>
+</div>
+
+<div class="big-message" id="bigMessage"></div>
+
+<div class="secret-display" id="secretDisplay"></div>
+
+<div class="final-hint hidden" id="finalHint">🔑 Vous pouvez maintenant ouvrir la boîte à clé qui se trouve dans le musée du laboratoire !</div>
+
+<div class="info-box hidden" id="infoBox">
+  <h2>📖 Le saviez-vous ? — YAMNet, l'oreille artificielle</h2>
+  <p>Chaque cri que vous avez imité a été analysé par <b>YAMNet</b>, un <b>réseau de neurones</b>
+  entraîné par Google. Il a appris sur <b>AudioSet</b>, une base de données de plus de
+  500 millions d'extraits sonores annotés, issus de 2,1 millions de vidéos YouTube,
+  couvrant <b>521 classes de sons</b> : animaux, instruments, voix humaines, machines…</p>
+  <p>Le son est découpé en fenêtres de 0,96 seconde, transformées en <b>spectrogrammes</b> —
+  des « images du son » qui montrent les fréquences qui se succèdent dans le temps.
+  Le réseau compare chaque image à ce qu'il a appris et renvoie un <b>score de confiance</b>
+  (entre 0 et 1) pour chacune des 521 classes. Quand le score du bon animal dépasse
+  le seuil de reconnaissance assez longtemps, l'énigme est résolue !</p>
+</div>
+
+<div class="status-bar" id="statusBar"></div>
+
+<div class="congrats-overlay hidden" id="congratsOverlay">
+  <div class="congrats-emoji" id="congratsEmoji"></div>
+  <div class="congrats-text" id="congratsText">Énigme résolue !</div>
+</div>
+
+<div class="admin-hint">Mode secours : double-clic sur l'énigme · Raccourcis : Ctrl+Alt+C (finir) · Ctrl+Alt+V (relancer)</div>
+
+<script src="vendor/tf-core.min.js"></script>
+<script src="vendor/tf-backend-cpu.min.js"></script>
+<script src="vendor/tf-tflite.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

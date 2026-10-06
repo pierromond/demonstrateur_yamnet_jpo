@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Mission Silence — lancement autonome (Linux / Mac)
-# Aucune installation : un runtime Node.js portable peut être embarqué dans runtime/.
+# Le Cri du Vivant — version autonome (Linux / Mac)
+# Reconnaissance YAMNet dans le navigateur, aucun serveur applicatif.
+# Aucune installation : Node.js est embarqué dans runtime/ si présent.
 cd "$(dirname "$0")"
 
 NODE=""
@@ -19,15 +20,15 @@ if [ -z "$NODE" ]; then
   exit 1
 fi
 
-echo "Démarrage de Mission Silence…"
-echo "  Page : http://localhost:3000"
+echo "Démarrage du Cri du Vivant…"
+echo "  Page : http://localhost:8765"
 echo "  Arrêt : Ctrl+C ici"
-"$NODE" server.js &
+"$NODE" serve.js &
 SERVER_PID=$!
 sleep 2
 if command -v xdg-open >/dev/null 2>&1; then
-  xdg-open "http://localhost:3000" >/dev/null 2>&1
+  xdg-open "http://localhost:8765" >/dev/null 2>&1
 elif command -v open >/dev/null 2>&1; then
-  open "http://localhost:3000" >/dev/null 2>&1
+  open "http://localhost:8765" >/dev/null 2>&1
 fi
 wait "$SERVER_PID"

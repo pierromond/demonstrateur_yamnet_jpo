@@ -1,6 +1,7 @@
 @echo off
-rem Spectro Masked - lancement autonome (Windows)
-rem Aucune installation : un runtime Node.js portable peut etre embarque dans runtime\.
+rem Spectro Masked - version autonome (Windows)
+rem Aucun serveur applicatif, aucun acces reseau.
+rem Aucune installation : Node.js est embarque dans runtime\ si present.
 setlocal
 cd /d "%~dp0"
 
@@ -18,8 +19,7 @@ if errorlevel 1 (
 echo Demarrage de Spectro Masked...
 echo   Page : http://localhost:4000
 echo   Micro et MIDI : ouvrir la page dans Chrome ou Edge sur CE PC
-echo   Arret : fermer la fenetre noire ou faites Ctrl+C dedans
-echo.
-start "Spectro Masked" cmd /k "%NODE% server.js"
+echo   Arret : fermer cette fenetre
+start "Spectro Masked" cmd /k "%NODE% serve.js"
 timeout /t 2 /nobreak >nul
 start "" "http://localhost:4000"

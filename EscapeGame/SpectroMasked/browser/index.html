@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spectro Masked — sons</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg: #0b1020; --panel: #131a30; --ok: #2ecc71; --warn: #f1c40f; --danger: #e74c3c; --text: #ecf0f1; --muted: #8fa1b3; }
+  body { background: var(--bg); color: var(--text); font-family: "Segoe UI", Arial, sans-serif; padding: 16px; }
+  #app { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  h1 { font-size: 1.25rem; letter-spacing: 1px; }
+  .hint { font-size: .85rem; color: var(--muted); }
+  .card { background: var(--panel); border: 1px solid #2a3a55; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .status { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge { padding: 5px 12px; border-radius: 8px; font-weight: 900; font-size: .85rem; background: #5b1d1d; color: #ff8a8a; }
+  .badge.ok { background: #1e4620; color: var(--ok); }
+  button { padding: 10px 14px; border: none; border-radius: 10px; background: #2a3a55; color: var(--text); font-size: .95rem; font-weight: 700; cursor: pointer; }
+  button:hover { background: #36507a; }
+  .btn-ok { background: #1d6b34; } .btn-ok:hover { background: #258a43; }
+  input[type=range] { width: 140px; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  td { padding: 6px 8px; border-bottom: 1px solid #1c2942; }
+  td:first-child { width: 90px; }
+  kbd { background: #0e1526; border: 1px solid #2a3a55; border-radius: 6px; padding: 3px 9px; font-family: monospace; font-weight: 900; letter-spacing: 1px; }
+  #flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity .12s; background: #2ecc71; }
+  #flash.on { opacity: .18; }
+  #lastSound { font-weight: 900; color: var(--ok); min-height: 1.2em; }
+</style>
+</head>
+<body>
+<div id="flash"></div>
+<main id="app">
+  <h1>🎹 Spectro Masked — déclencheur de sons</h1>
+  <p class="hint">Pas d'écran requis : les enfants appuient sur les touches du clavier ou sur un launchpad MIDI branché — les sons sortent sur les enceintes de ce PC.</p>
+
+  <div class="card">
+    <div class="status">
+      <span>Audio : <span id="audioBadge" class="badge">non activé</span></span>
+      <span>MIDI : <span id="midiBadge" class="badge">vérification…</span></span>
+      <button id="btnActivate" class="btn-ok" type="button">Activer l'audio</button>
+      <button id="btnRetryMidi" type="button">Réessayer MIDI</button>
+      <label class="hint">volume <input id="volume" type="range" min="0" max="100" value="90"></label>
+    </div>
+    <p class="hint">Clavier : taper les touches <b>a z e r t y u i</b> (le libellé inscrit sur la touche).</p>
+    <p class="hint" id="midiDetail"></p>
+  </div>
+
+  <div class="card">
+    <p>Dernier son : <span id="lastSound">—</span></p>
+  </div>
+
+  <div class="card">
+    <table id="mapTable"></table>
+  </div>
+</main>
+
+<script>
+let ctx = null;
+let buffers = new Map();
+let soundByKey = new Map();
+let soundByMidi = new Map();
+let sounds = [];
+let padColors = new Map();
+let currentSrc = null;
+let loading = false;
+let midiOutputs = [];
+
+const PALETTE = {
+  "#ff0000": 3, "#ff7f00": 6, "#ffff00": 9, "#00ff00": 12, "#00ff7f": 15,
+  "#00ffff": 21, "#00bfff": 24, "#0000ff": 27, "#7f00ff": 30, "#ff00ff": 33,
+  "#ff007f": 36, "#ffffff": 39, "#808080": 41
+};
+
+function colorIndex(hex) {
+  const k = (hex || "").toLowerCase();
+  return PALETTE[k] != null ? PALETTE[k] : 3;
+}
+
+function launchpadOutputs() {
+  return midiOutputs.filter((o) => /launchpad|mk2/i.test(o.name));
+}
+
+function padPos(note) {
+  const n = note - 10;
+  const rang = Math.floor(n / 10) + 1;
+  const col = n % 10;
+  return (rang >= 1 && rang <= 8 && col >= 1 && col <= 8) ? " · R" + rang + " C" + col : "";
+}
+
+function buildPadColors(data) {
+  padColors = new Map();
+  for (const s of (data.sounds || [])) {
+    if (s.midi != null && s.color) padColors.set(s.midi, colorIndex(s.color));
+  }
+  for (const p of (data.pads || [])) {
+    if (p && p.note != null && (p.color || p.vel != null)) {
+      padColors.set(p.note, p.vel != null ? p.vel : colorIndex(p.color));
+    }
+  }
+}
+
+function lightNote(note, on) {
+  const idx = padColors.get(note);
+  if (idx == null) return;
+  for (const out of launchpadOutputs()) {
+    try { out.send([0x90, note, on ? idx : 0]); } catch (err) { /* port perdu */ }
+  }
+}
+
+function lightOff(note) {
+  for (const out of launchpadOutputs()) {
+    try { out.send([0x90, note, 0]); } catch (err) { /* port perdu */ }
+  }
+}
+
+function lightAllPads() {
+  const out = launchpadOutputs();
+  if (!out.length) return false;
+  for (const o of out) {
+    try { o.send([0xb0, 0x00, 0]); } catch (err) { /* port perdu */ }
+  }
+  for (const note of padColors.keys()) lightNote(note, true);
+  return true;
+}
+
+const $ = (id) => document.getElementById(id);
+
+function playSound(s) {
+  if (!ctx || !buffers.has(s.file)) return;
+  if (currentSrc) {
+    try { currentSrc.stop(); } catch (err) { /* déjà terminé */ }
+    currentSrc = null;
+  }
+  const src = ctx.createBufferSource();
+  src.buffer = buffers.get(s.file);
+  const gain = ctx.createGain();
+  gain.gain.value = $("volume").value / 100;
+  src.connect(gain);
+  gain.connect(ctx.destination);
+  src.onended = () => { if (currentSrc === src) currentSrc = null; };
+  src.start();
+  currentSrc = src;
+  $("lastSound").textContent = s.name + " (" + s.file + ")";
+  const flash = $("flash");
+  flash.classList.add("on");
+  setTimeout(() => flash.classList.remove("on"), 120);
+}
+
+async function loadSounds() {
+  if (loading) return;
+  loading = true;
+  try {
+    const resp = await fetch("config.json");
+    const data = await resp.json();
+    sounds = data.sounds;
+    buildPadColors(data);
+    const rows = [];
+    let loaded = 0;
+    for (const s of data.sounds) {
+      const url = "audio/" + encodeURIComponent(s.file);
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const buf = await ctx.decodeAudioData(await res.arrayBuffer());
+        buffers.set(s.file, buf);
+        if (s.key) soundByKey.set(String(s.key).toLowerCase(), s);
+        if (s.midi != null) soundByMidi.set(s.midi, s);
+        loaded++;
+        $("lastSound").textContent = "chargement des sons… " + loaded + "/" + data.sounds.length;
+      } catch (err) {
+        $("lastSound").textContent = "son introuvable : " + s.file;
+      }
+      rows.push(
+        "<tr><td>" + (s.key ? "<kbd>" + s.key + "</kbd>" : "<span class=\"hint\">pad</span>") + "</td>" +
+        "<td>" + s.name + "</td>" +
+        "<td>" + (s.color
+          ? "<span title=\"LED launchpad\" style=\"display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid #2a3a55;background:" + s.color + "\"></span>"
+          : "<span class=\"hint\">—</span>") + "</td>" +
+        "<td class=\"hint\">MIDI " + (s.midi != null ? s.midi : "—") + padPos(s.midi) + "</td></tr>"
+      );
+    }
+    for (const p of (data.pads || [])) {
+      rows.push(
+        "<tr><td></td><td>" + (p.label || "Pad " + p.note) + "</td>" +
+        "<td><span title=\"LED launchpad\" style=\"display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid #2a3a55;background:" + (p.color || "#333") + "\"></span></td>" +
+        "<td class=\"hint\">MIDI " + p.note + padPos(p.note) + "</td></tr>"
+      );
+    }
+    $("mapTable").innerHTML = "<tr><td class=\"hint\">Touche/Pad</td><td class=\"hint\">Son</td><td class=\"hint\">LED</td><td class=\"hint\">Note</td></tr>" + rows.join("");
+    $("lastSound").textContent = loaded + "/" + data.sounds.length + " sons chargés";
+  } finally {
+    loading = false;
+  }
+}
+
+$("btnActivate").addEventListener("click", async () => {
+  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  await ctx.resume();
+  const badge = $("audioBadge");
+  badge.textContent = "activé";
+  badge.className = "badge ok";
+  $("btnActivate").blur();
+  await loadSounds();
+  setupMidi();
+});
+
+$("btnRetryMidi").addEventListener("click", () => {
+  setupMidi();
+  $("btnRetryMidi").blur();
+});
+initMidiHint();
+
+document.addEventListener("keydown", (e) => {
+  if (e.repeat) return;
+  const s = soundByKey.get(e.key.toLowerCase());
+  if (s) playSound(s);
+});
+
+function setupMidi() {
+  if (!navigator.requestMIDIAccess) {
+    $("midiBadge").textContent = "non supporté (Chrome ou Edge requis)";
+    $("midiBadge").className = "badge";
+    $("midiDetail").textContent = "Firefox ne gère pas le MIDI : ouvrez cette page dans Chrome/Edge sur le PC où le Launchpad est branché.";
+    return;
+  }
+  if (!window.isSecureContext) {
+    $("midiBadge").textContent = "bloqué (HTTP non sécurisé)";
+    $("midiBadge").className = "badge";
+    $("midiDetail").textContent = "Le navigateur bloque le MIDI sur cette adresse. Ouvrez http://localhost:4000 (ou l'adresse https du tunnel) dans Chrome.";
+    return;
+  }
+  navigator.requestMIDIAccess().then((access) => {
+    const attach = (input) => {
+      input.onmidimessage = (e) => {
+        const [status, note, vel] = e.data;
+        const chan = status & 0xf0;
+        const s = soundByMidi.get(note);
+        if (chan === 0x90 && vel > 0 && s) playSound(s);
+        if (padColors.has(note)) lightNote(note, true);
+        else lightOff(note);
+      };
+    };
+    const show = () => {
+      const inputs = [...access.inputs.values()];
+      for (const input of inputs) attach(input);
+      const names = inputs.map((i) => i.name).filter(Boolean);
+      const connected = names.length > 0;
+      $("midiBadge").textContent = connected ? names.join(", ") : "aucun appareil";
+      $("midiBadge").className = "badge " + (connected ? "ok" : "");
+      const lit = launchpadOutputs().length > 0;
+      $("midiDetail").textContent = connected
+        ? (lit ? "Launchpad détecté — pads colorés, appuyez sur les pads." : "Launchpad détecté mais sortie MIDI introuvable.")
+        : "Aucun appareil MIDI trouvé : branchez le Launchpad puis cliquez « Réessayer MIDI ».";
+    };
+    access.onstatechange = () => {
+      midiOutputs = [...access.outputs.values()];
+      show();
+      lightAllPads();
+    };
+    midiOutputs = [...access.outputs.values()];
+    show();
+    lightAllPads();
+  }).catch((err) => {
+    const name = err && err.name ? err.name : "";
+    $("midiBadge").textContent = "accès refusé";
+    $("midiBadge").className = "badge";
+    if (name === "NotAllowedError" || name === "SecurityError") {
+      $("midiDetail").textContent = "Chrome demande l'autorisation MIDI : cliquez sur « Autoriser » quand elle s'affiche, puis sur « Réessayer MIDI » (ou corrigez-la dans chrome://settings/content/midi).";
+    } else {
+      $("midiDetail").textContent = "Erreur MIDI : " + (err && err.message ? err.message : err);
+    }
+  });
+}
+
+function initMidiHint() {
+  if (!navigator.requestMIDIAccess) {
+    $("midiBadge").textContent = "non supporté (Chrome requis)";
+    $("midiBadge").className = "badge";
+    $("midiDetail").textContent = "Ce navigateur ne gère pas le MIDI : utilisez Chrome ou Edge sur le PC où le Launchpad est branché.";
+    return;
+  }
+  if (!window.isSecureContext) {
+    $("midiBadge").textContent = "bloqué (HTTP non sécurisé)";
+    $("midiBadge").className = "badge";
+    $("midiDetail").textContent = "Le navigateur bloque le MIDI sur cette adresse. Ouvrez http://localhost:4000 (ou l'adresse https du tunnel) dans Chrome.";
+    return;
+  }
+  $("midiBadge").textContent = "en attente";
+  $("midiBadge").className = "badge";
+  $("midiDetail").textContent = "Cliquez sur « Réessayer MIDI » (ou « Activer l'audio ») : Chrome demandera l'autorisation MIDI, choisissez « Autoriser ».";
+}
+
+async function bootPadColors() {
+  try {
+    const resp = await fetch("config.json");
+    buildPadColors(await resp.json());
+    lightAllPads();
+  } catch (err) { /* config indisponible */ }
+}
+
+bootPadColors();
+</script>
+</body>
+</html>
