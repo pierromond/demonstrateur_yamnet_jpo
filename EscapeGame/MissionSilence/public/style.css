@@ -287,3 +287,6 @@ body.shake { animation: shake .3s linear infinite; }
   background: rgba(231, 76, 60, .92); color: #fff;
   font-weight: 800; letter-spacing: 1px; font-size: clamp(.9rem, 2.2vw, 1.2rem);
 }
+/* Réserve la hauteur du bandeau pour ne pas masquer le haut de l'écran.
+   Le décalage est appliqué sur #app (non zoomé) pour rester exact malgré fitScreen. */
+body.cal-missing main#app { padding-top: clamp(42px, 6vh, 60px); }

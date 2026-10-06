@@ -217,7 +217,12 @@ function fitScreen(el) {
   const shrink = () => {
     if (!el) return;
     el.style.zoom = "1";
-    const avail = window.innerHeight - 8;
+    let reserve = 24;
+    const foot = document.querySelector(".footer");
+    if (foot) reserve += foot.getBoundingClientRect().height;
+    const banner = $("calBanner");
+    if (banner && !banner.classList.contains("hidden")) reserve += banner.getBoundingClientRect().height;
+    const avail = window.innerHeight - reserve;
     const need = el.scrollHeight;
     if (need > avail) el.style.zoom = String(Math.max(0.5, avail / need));
   };
@@ -291,13 +296,14 @@ function enterState(name, opts) {
     $("successAttempt").textContent = String(attempt);
     $("successStats").textContent = "Silence total : " + Math.round(maxDbRun) + " dB = " + equivLabel(maxDbRun) +
       " · Pic : " + Math.round(peakDb) + " dB";
-    fitScreen($("scrSuccess"));
   }
 
   if (name === "IDLE" || name === "DEMO") {
     maxDbRun = 0;
     noiseAbove = false;
   }
+
+  if (name !== "EXPLODE" && screens[name]) fitScreen(screens[name]);
 
   pushState();
 }
@@ -647,8 +653,16 @@ function renderWordBoxes() {
 
 $("wordEntry").addEventListener("input", (e) => {
   e.target.value = e.target.value.toLowerCase()
-    .replace(/[^a-z0-9àâäéèêëîïôöùûüç]/g, "").slice(-CONFIG.word.length);
+    .replace(/[^a-z0-9àâäéêëîïôöùûüç]/g, "").slice(-CONFIG.word.length);
   checkWordEntry();
+});
+
+// Cliquer/toucher les cases visuelles (ou le champ) ramène le focus sur la saisie.
+$("wordBoxes").addEventListener("click", () => $("wordEntry").focus());
+
+// Réajuste l'échelle de l'écran courant quand la fenêtre change de taille.
+window.addEventListener("resize", () => {
+  if (state !== "EXPLODE" && screens[state]) fitScreen(screens[state]);
 });
 
 // ---- Panneau animateur ----
@@ -739,6 +753,7 @@ function updateCalBanner() {
   if (!b) return;
   const ok = calibrationInfo != null && Number.isFinite(calibrationInfo.offsetDb);
   b.classList.toggle("hidden", ok);
+  document.body.classList.toggle("cal-missing", !ok);
 }
 
 function syncPanelFromConfig() {
